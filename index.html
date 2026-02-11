@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Графік відключень — Миколаївобленерго</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #c8c9be;
+            --text: #FAFBF0;
+            --accent-green: #22c55e;
+            --accent-red: #ef4444;
+            --accent-yellow: #eab308;
+        }
+
+        [data-theme="dark"] {
+            --bg: #1a1d1f;
+            --text: #4a4f52;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            transition: background 0.3s, color 0.3s;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 480px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Вибір черги */
+        .queue-selection {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 40px;
+            color: var(--text);
+            text-align: center;
+        }
+
+        .pointing-image {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .queue-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .queue-btn {
+            aspect-ratio: 1;
+            background: var(--text);
+            border: none;
+            border-radius: 10px;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--bg);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+        }
+
+        .queue-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .queue-btn:active {
+            transform: translateY(0);
+        }
+
+        .remember-choice {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--bg);
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: var(--text);
+            border: none;
+            border-radius: 10px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: var(--bg);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch.active {
+            background: var(--accent-green);
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: var(--text);
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(20px);
+            background: white;
+        }
+
+        /* Статус */
+        .status-view {
+            display: none;
+        }
+
+        .status-view.active {
+            display: block;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 14px;
+            cursor: pointer;
+            margin-bottom: 24px;
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn:hover {
+            opacity: 0.8;
+        }
+
+        .back-btn-arrow {
+            font-size: 24px;
+            font-weight: 900;
+        }
+
+        .back-btn-queue {
+            text-transform: uppercase;
+            border: 4px solid var(--text);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 700;
+        }
+
+        .status-hero {
+            text-align: center;
+            padding: 40px 0 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .status-indicator {
+            width: 240px;
+            height: 240px;
+            margin: 0 auto 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-indicator img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        #lottieContainer {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #lottieContainer img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .status-indicator.on {
+            /* Лампочка */
+        }
+
+        .status-indicator.off {
+            /* Лотті анімація */
+        }
+
+        .status-text {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text);
+            text-transform: uppercase;
+            border: 4px solid var(--text);
+            padding: 16px 24px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .expand-btn {
+            display: none;
+        }
+
+        /* Таймлайн */
+        .schedule-timeline {
+            margin-top: 32px;
+        }
+
+        .day-section {
+            margin-bottom: 40px;
+        }
+
+        .day-title {
+            display: none;
+        }
+
+        .timeline-container {
+            position: relative;
+            padding: 0;
+        }
+
+        .timeline-labels-top {
+            display: none;
+        }
+
+        .timeline {
+            display: flex;
+            height: 60px;
+            position: relative;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .timeline-segment {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0;
+            color: transparent;
+            transition: opacity 0.2s;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .timeline-segment:hover {
+            opacity: 0.9;
+        }
+
+        .timeline-segment-label {
+            position: absolute;
+            bottom: calc(100% + 12px);
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            z-index: 10;
+        }
+
+        .timeline-segment.active .timeline-segment-label {
+            opacity: 1;
+        }
+
+        .timeline-segment.off {
+            background: var(--accent-red);
+        }
+
+        .timeline-segment.off .timeline-segment-label {
+            color: var(--accent-red);
+        }
+
+        .timeline-segment.on {
+            background: var(--accent-green);
+        }
+
+        .timeline-segment.on .timeline-segment-label {
+            color: var(--accent-green);
+        }
+
+        .timeline-segment.maybe {
+            background: var(--accent-yellow);
+        }
+
+        .timeline-segment.maybe .timeline-segment-label {
+            color: var(--accent-yellow);
+        }
+
+        .legend {
+            display: none;
+        }
+
+        /* Offline banner */
+        .offline-banner {
+            display: none;
+            background: var(--accent-yellow);
+            color: var(--bg);
+            text-align: center;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .offline-banner.visible {
+            display: block;
+        }
+
+        @media (max-width: 640px) {
+            .queue-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .status-text {
+                font-size: 18px;
+            }
+
+            .timeline {
+                height: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-banner" id="offlineBanner">
+        Немає з'єднання. Показано збережені дані
+    </div>
+
+    <div class="container">
+        <!-- Вибір черги -->
+        <div class="queue-selection" id="queueSelection">
+            <div class="logo">МИКОЛАЇВОБЛЕНЕРГО</div>
+            <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/People/Backhand%20Index%20Pointing%20Down.webp" alt="👇" class="pointing-image">
+            <h1>Оберіть вашу чергу щоб перевірити статус</h1>
+            
+            <div class="queue-grid">
+                <button class="queue-btn" data-queue="1.1">1.1</button>
+                <button class="queue-btn" data-queue="1.2">1.2</button>
+                <button class="queue-btn" data-queue="2.1">2.1</button>
+                <button class="queue-btn" data-queue="2.2">2.2</button>
+                <button class="queue-btn" data-queue="3.1">3.1</button>
+                <button class="queue-btn" data-queue="3.2">3.2</button>
+                <button class="queue-btn" data-queue="4.1">4.1</button>
+                <button class="queue-btn" data-queue="4.2">4.2</button>
+                <button class="queue-btn" data-queue="5.1">5.1</button>
+                <button class="queue-btn" data-queue="5.2">5.2</button>
+                <button class="queue-btn" data-queue="6.1">6.1</button>
+                <button class="queue-btn" data-queue="6.2">6.2</button>
+            </div>
+            
+            <label class="remember-choice">
+                <span>Запам'ятати вибір</span>
+                <div class="toggle-switch" id="toggleSwitch">
+                    <div class="toggle-slider"></div>
+                </div>
+            </label>
+        </div>
+
+        <!-- Статус -->
+        <div class="status-view" id="statusView">
+            <button class="back-btn" id="backBtn">
+                <span class="back-btn-arrow">←</span>
+                <span class="back-btn-queue" id="backBtnText">Змінити чергу</span>
+            </button>
+            
+            <div class="status-hero">
+                <div class="status-indicator" id="statusIndicator">
+                    <div id="lottieContainer"></div>
+                </div>
+                <div class="status-text" id="statusText"></div>
+            </div>
+
+            <div class="schedule-timeline" id="scheduleTimeline">
+                <div class="day-section">
+                    <div class="day-title" id="todayTitle">Сьогодні</div>
+                    <div class="timeline-container">
+                        <div class="timeline-labels-top" id="todayLabelsTop"></div>
+                        <div class="timeline" id="todayTimeline"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API endpoint
+        const API_URL = 'https://off.energy.mk.ua';
+
+        // Демо-дані графіків (резервні дані)
+        const DEMO_SCHEDULES = {
+            '1.1': {
+                today: [[0, 2], [4, 10], [12, 18], [20, 24]],
+                tomorrow: [[0, 2], [5, 11], [13, 19], [21, 24]]
+            },
+            '1.2': {
+                today: [[0, 6], [8, 14], [16, 22]],
+                tomorrow: [[1, 7], [9, 15], [17, 23]]
+            },
+            '2.1': {
+                today: [[0, 4], [6, 12], [14, 20], [22, 24]],
+                tomorrow: [[0, 5], [7, 13], [15, 21], [23, 24]]
+            },
+            '2.2': {
+                today: [[0, 6], [8, 14], [16, 22]],
+                tomorrow: [[0, 7], [9, 15], [17, 23]]
+            },
+            '3.1': {
+                today: [[0, 4], [6, 12], [14, 20], [22, 24]],
+                tomorrow: [[0, 4], [6, 13], [15, 21], [23, 24]]
+            },
+            '3.2': {
+                today: [[0, 1], [4, 8], [10, 16], [18, 24]],
+                tomorrow: [[0, 2], [5, 9], [11, 17], [19, 24]]
+            },
+            '4.1': {
+                today: [[0, 3], [6, 9], [12, 15], [18, 21]],
+                tomorrow: [[0, 3], [6, 9], [12, 15], [18, 21]]
+            },
+            '4.2': {
+                today: [[3, 6], [9, 12], [15, 18], [21, 24]],
+                tomorrow: [[3, 6], [9, 12], [15, 18], [21, 24]]
+            },
+            '5.1': {
+                today: [[0, 4], [8, 12], [16, 20]],
+                tomorrow: [[0, 4], [8, 12], [16, 20]]
+            },
+            '5.2': {
+                today: [[4, 8], [12, 16], [20, 24]],
+                tomorrow: [[4, 8], [12, 16], [20, 24]]
+            },
+            '6.1': {
+                today: [[0, 6], [12, 18]],
+                tomorrow: [[0, 6], [12, 18]]
+            },
+            '6.2': {
+                today: [[6, 12], [18, 24]],
+                tomorrow: [[6, 12], [18, 24]]
+            }
+        };
+
+        // Стан
+        let currentQueue = null;
+        let scheduleData = null;
+        let lottieAnimation = null;
+
+        // Елементи
+        const queueSelection = document.getElementById('queueSelection');
+        const statusView = document.getElementById('statusView');
+        const queueButtons = document.querySelectorAll('.queue-btn');
+        const toggleSwitch = document.getElementById('toggleSwitch');
+        const backBtn = document.getElementById('backBtn');
+        const backBtnText = document.getElementById('backBtnText');
+        const scheduleTimeline = document.getElementById('scheduleTimeline');
+        const statusIndicator = document.getElementById('statusIndicator');
+        const lottieContainer = document.getElementById('lottieContainer');
+        const statusText = document.getElementById('statusText');
+        const todayTimeline = document.getElementById('todayTimeline');
+        const todayLabelsTop = document.getElementById('todayLabelsTop');
+        const offlineBanner = document.getElementById('offlineBanner');
+
+        // Тема в залежності від наявності світла
+        function updateTheme(hasLight) {
+            document.documentElement.setAttribute('data-theme', hasLight ? 'light' : 'dark');
+        }
+
+        // Ініціалізація
+        function init() {
+            // Перевірка збережених даних
+            const saved = localStorage.getItem('selectedQueue');
+            if (saved) {
+                currentQueue = saved;
+                toggleSwitch.classList.add('active');
+                loadScheduleData();
+                showStatus();
+            }
+
+            // Перевірка offline
+            if (!navigator.onLine) {
+                offlineBanner.classList.add('visible');
+            }
+        }
+
+        // Тумблер
+        toggleSwitch.addEventListener('click', () => {
+            toggleSwitch.classList.toggle('active');
+        });
+
+        // Вибір черги
+        queueButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentQueue = btn.dataset.queue;
+                
+                if (toggleSwitch.classList.contains('active')) {
+                    localStorage.setItem('selectedQueue', currentQueue);
+                }
+
+                loadScheduleData();
+                showStatus();
+            });
+        });
+
+        // Повернутися
+        backBtn.addEventListener('click', () => {
+            queueSelection.style.display = 'block';
+            statusView.classList.remove('active');
+        });
+
+        // Завантаження даних
+        async function loadScheduleData() {
+            try {
+                // Спроба завантажити з API
+                const response = await fetch(`${API_URL}/api/schedule?queue=${encodeURIComponent(currentQueue)}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    scheduleData = data;
+                } else {
+                    throw new Error('API недоступний');
+                }
+            } catch (error) {
+                console.log('Використовуємо демо-дані:', error);
+                // Використовуємо демо-дані
+                scheduleData = DEMO_SCHEDULES[currentQueue];
+            }
+            
+            // Зберігаємо в localStorage
+            const cacheData = {
+                queue: currentQueue,
+                schedule: scheduleData,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('scheduleCache', JSON.stringify(cacheData));
+        }
+
+        // Показати статус
+        function showStatus() {
+            queueSelection.style.display = 'none';
+            statusView.classList.add('active');
+
+            const now = new Date();
+            const currentHour = now.getHours();
+            
+            // Перевірка, чи є світло зараз
+            const hasLight = !isOutageNow(scheduleData.today, currentHour);
+            
+            // Оновлення теми
+            updateTheme(hasLight);
+
+            // Статус індикатор
+            statusIndicator.className = 'status-indicator ' + (hasLight ? 'on' : 'off');
+            
+            // Очистити попередній контент
+            lottieContainer.innerHTML = '';
+            if (lottieAnimation) {
+                lottieAnimation.destroy();
+                lottieAnimation = null;
+            }
+
+            if (hasLight) {
+                // Показати лампочку
+                const img = document.createElement('img');
+                img.src = 'https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Objects/Light%20Bulb.webp';
+                img.alt = 'Світло є';
+                lottieContainer.appendChild(img);
+            } else {
+                // Показати Lottie анімацію
+                lottieAnimation = lottie.loadAnimation({
+                    container: lottieContainer,
+                    renderer: 'svg',
+                    loop: true,
+                    autoplay: true,
+                    path: 'https://cdn.changes.tg/gifts/models/Valentine%20Box/lottie/Fuse%20Box.json'
+                });
+            }
+
+            // Оновити текст кнопки "Назад"
+            backBtnText.textContent = `Черга ${currentQueue}`;
+
+            // Статус текст в одну строку
+            if (hasLight) {
+                const nextOutage = getNextOutage(scheduleData.today, currentHour);
+                if (nextOutage !== null) {
+                    statusText.textContent = `Світло є, вимкнуть о ${formatTime(nextOutage)}`;
+                } else {
+                    if (scheduleData.tomorrow && scheduleData.tomorrow.length > 0) {
+                        const tomorrowFirst = scheduleData.tomorrow[0][0];
+                        statusText.textContent = `Світло є, наступне відключення завтра о ${formatTime(tomorrowFirst)}`;
+                    } else {
+                        statusText.textContent = `Світло є`;
+                    }
+                }
+            } else {
+                const nextRestore = getNextRestore(scheduleData.today, currentHour);
+                if (nextRestore !== null) {
+                    statusText.textContent = `Світла немає, буде о ${formatTime(nextRestore)}`;
+                } else {
+                    statusText.textContent = 'Світла немає, інформація оновлюється';
+                }
+            }
+
+            // Побудова таймлайнів
+            renderTimeline(todayTimeline, todayLabelsTop, scheduleData.today);
+        }
+
+        // Перевірка відключення зараз
+        function isOutageNow(schedule, hour) {
+            return schedule.some(([start, end]) => hour >= start && hour < end);
+        }
+
+        // Наступне відключення
+        function getNextOutage(schedule, hour) {
+            for (let [start, end] of schedule) {
+                if (hour < start) return start;
+            }
+            return null;
+        }
+
+        // Наступне відновлення
+        function getNextRestore(schedule, hour) {
+            for (let [start, end] of schedule) {
+                if (hour >= start && hour < end) return end;
+            }
+            return null;
+        }
+
+        // Формат часу
+        function formatTime(hour) {
+            return `${hour.toString().padStart(2, '0')}:00`;
+        }
+
+        // Рендер таймлайну
+        function renderTimeline(timeline, labelsContainer, schedule) {
+            timeline.innerHTML = '';
+            labelsContainer.innerHTML = '';
+            
+            // Групуємо години за статусом для створення сегментів
+            const segments = [];
+            let currentStatus = null;
+            let currentStart = 0;
+            
+            for (let hour = 0; hour < 24; hour++) {
+                const isOff = schedule.some(([start, end]) => hour >= start && hour < end);
+                const isMaybe = schedule.some(([start, end]) => hour === start || hour === end - 1);
+                
+                let status;
+                if (isOff) {
+                    status = isMaybe ? 'maybe' : 'off';
+                } else {
+                    status = 'on';
+                }
+                
+                if (status !== currentStatus) {
+                    if (currentStatus !== null) {
+                        segments.push({
+                            start: currentStart,
+                            end: hour,
+                            status: currentStatus
+                        });
+                    }
+                    currentStatus = status;
+                    currentStart = hour;
+                }
+            }
+            
+            // Додаємо останній сегмент
+            if (currentStatus !== null) {
+                segments.push({
+                    start: currentStart,
+                    end: 24,
+                    status: currentStatus
+                });
+            }
+            
+            // Створюємо сегменти таймлайну
+            segments.forEach(seg => {
+                const segment = document.createElement('div');
+                segment.className = `timeline-segment ${seg.status}`;
+                segment.style.flex = seg.end - seg.start;
+                
+                const label = document.createElement('div');
+                label.className = 'timeline-segment-label';
+                label.textContent = `${formatTime(seg.start)}-${formatTime(seg.end)}`;
+                segment.appendChild(label);
+                
+                // Клік для показу/приховування мітки
+                segment.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    // Якщо цей сегмент вже активний - приховати
+                    if (this.classList.contains('active')) {
+                        this.classList.remove('active');
+                    } else {
+                        // Прибрати active з усіх сегментів
+                        document.querySelectorAll('.timeline-segment').forEach(s => s.classList.remove('active'));
+                        // Додати active до поточного
+                        this.classList.add('active');
+                    }
+                });
+                
+                timeline.appendChild(segment);
+            });
+            
+            // Клік поза сегментами приховує всі мітки
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.timeline-segment')) {
+                    document.querySelectorAll('.timeline-segment').forEach(s => s.classList.remove('active'));
+                }
+            });
+        }
+
+        // Offline/Online події
+        window.addEventListener('offline', () => {
+            offlineBanner.classList.add('visible');
+        });
+
+        window.addEventListener('online', () => {
+            offlineBanner.classList.remove('visible');
+            // Оновити дані
+            if (currentQueue) {
+                loadScheduleData();
+                showStatus();
+            }
+        });
+
+        init();
+    </script>
+</body>
+</html>
