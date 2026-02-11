@@ -13,24 +13,26 @@
         }
 
         :root {
-            --bg: #c8c9be;
-            --text: #FAFBF0;
-            --accent-green: #22c55e;
-            --accent-red: #ef4444;
-            --accent-yellow: #eab308;
-        }
-
-        [data-theme="dark"] {
-            --bg: #1a1d1f;
-            --text: #4a4f52;
+            --bg-dark: #1E1C24;
+            --text-dark: #6B6874;
+            --bg-light: #FAF7F0;
+            --text-light: #9B9388;
+            --accent-green: #229b59;
+            --accent-red: #cd2222;
+            --accent-yellow: #edd301;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-            background: var(--bg);
-            color: var(--text);
+            background: var(--bg-dark);
+            color: var(--text-dark);
             transition: background 0.3s, color 0.3s;
             min-height: 100vh;
+        }
+
+        body[data-theme="light"] {
+            background: var(--bg-light);
+            color: var(--text-light);
         }
 
         .container {
@@ -46,7 +48,7 @@
             text-align: center;
             display: flex;
             flex-direction: column;
-            align-items: stretch;
+            align-items: center;
         }
 
         .logo {
@@ -54,9 +56,17 @@
             font-weight: 700;
             letter-spacing: 1px;
             margin-bottom: 40px;
-            color: var(--text);
             text-align: center;
             white-space: nowrap;
+            width: 100%;
+        }
+
+        body[data-theme="light"] .logo {
+            color: var(--text-light);
+        }
+
+        body:not([data-theme="light"]) .logo {
+            color: var(--text-dark);
         }
 
         .pointing-title {
@@ -77,29 +87,177 @@
             width: 100%;
         }
 
+        body[data-theme="light"] h1 {
+            color: var(--text-light);
+        }
+
+        body:not([data-theme="light"]) h1 {
+            color: var(--text-dark);
+        }
+
+        .search-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 14px;
+            border-radius: 10px;
+            background: transparent;
+            margin-bottom: 16px;
+            font-weight: 600;
+            text-align: center;
+            outline: none;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        body[data-theme="light"] .search-input {
+            border: 3px solid var(--text-light);
+            color: var(--text-light);
+        }
+
+        body:not([data-theme="light"]) .search-input {
+            border: 3px solid var(--text-dark);
+            color: var(--text-dark);
+        }
+
+        .search-input::placeholder {
+            opacity: 0.6;
+            text-transform: uppercase;
+        }
+
+        body[data-theme="light"] .search-input::placeholder {
+            color: var(--text-light);
+        }
+
+        body:not([data-theme="light"]) .search-input::placeholder {
+            color: var(--text-dark);
+        }
+
+        body[data-theme="light"] .search-input:focus {
+            border-color: var(--text-light);
+        }
+
+        body:not([data-theme="light"]) .search-input:focus {
+            border-color: var(--text-dark);
+        }
+
+        .search-suggestions {
+            position: absolute;
+            width: 100%;
+            border-radius: 10px;
+            margin-top: -12px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+        }
+
+        body[data-theme="light"] .search-suggestions {
+            background: var(--text-light);
+            color: var(--bg-light);
+        }
+
+        body:not([data-theme="light"]) .search-suggestions {
+            background: var(--text-dark);
+            color: var(--bg-dark);
+        }
+
+        .search-suggestions.visible {
+            display: block;
+        }
+
+        .suggestion-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+
+        body[data-theme="light"] .suggestion-item {
+            border-bottom: 1px solid var(--bg-light);
+        }
+
+        body:not([data-theme="light"]) .suggestion-item {
+            border-bottom: 1px solid var(--bg-dark);
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        body[data-theme="light"] .suggestion-item:hover {
+            background: var(--bg-light);
+            color: var(--text-light);
+        }
+
+        body:not([data-theme="light"]) .suggestion-item:hover {
+            background: var(--bg-dark);
+            color: var(--text-dark);
+        }
+
+        .search-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
         .queue-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 8px;
             margin-bottom: 16px;
             margin-top: 16px;
-            align-self: stretch;
+            width: 100%;
         }
 
         .queue-btn {
             aspect-ratio: 1;
-            background: var(--text);
             border: none;
             border-radius: 10px;
             font-size: 28px;
             font-weight: 700;
-            color: var(--bg);
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 8px;
+            position: relative;
+        }
+
+        body[data-theme="light"] .queue-btn {
+            background: var(--text-light);
+            color: var(--bg-light);
+        }
+
+        body:not([data-theme="light"]) .queue-btn {
+            background: var(--text-dark);
+            color: var(--bg-dark);
+        }
+
+        .queue-btn.highlight-on {
+            background: var(--accent-green) !important;
+            color: white !important;
+        }
+
+        .queue-btn.highlight-off {
+            background: var(--accent-red) !important;
+            color: white !important;
+        }
+
+        .queue-btn.highlight-maybe {
+            background: var(--accent-yellow) !important;
+        }
+
+        body[data-theme="light"] .queue-btn.highlight-maybe {
+            color: var(--bg-light) !important;
+        }
+
+        body:not([data-theme="light"]) .queue-btn.highlight-maybe {
+            color: var(--bg-dark) !important;
         }
 
         .queue-btn:hover {
@@ -111,20 +269,7 @@
         }
 
         .remember-choice {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--bg);
-            margin-top: 16px;
-            padding: 12px 16px;
-            background: var(--text);
-            border: none;
-            border-radius: 10px;
-            text-transform: uppercase;
-            align-self: stretch;
+            display: none;
         }
 
         .toggle-switch {
@@ -148,9 +293,16 @@
             left: 2px;
             width: 20px;
             height: 20px;
-            background: var(--text);
             border-radius: 50%;
             transition: transform 0.3s;
+        }
+
+        body[data-theme="light"] .toggle-slider {
+            background: var(--text-light);
+        }
+
+        body:not([data-theme="light"]) .toggle-slider {
+            background: var(--text-dark);
         }
 
         .toggle-switch.active .toggle-slider {
@@ -170,7 +322,6 @@
         .back-btn {
             background: none;
             border: none;
-            color: var(--text);
             font-size: 14px;
             cursor: pointer;
             margin-bottom: 24px;
@@ -178,6 +329,14 @@
             display: flex;
             align-items: center;
             gap: 8px;
+        }
+
+        body[data-theme="light"] .back-btn {
+            color: var(--text-light);
+        }
+
+        body:not([data-theme="light"]) .back-btn {
+            color: var(--text-dark);
         }
 
         .back-btn:hover {
@@ -196,10 +355,17 @@
 
         .back-btn-queue {
             text-transform: uppercase;
-            border: 4px solid var(--text);
             padding: 8px 16px;
             border-radius: 8px;
             font-weight: 700;
+        }
+
+        body[data-theme="light"] .back-btn-queue {
+            border: 4px solid var(--text-light);
+        }
+
+        body:not([data-theme="light"]) .back-btn-queue {
+            border: 4px solid var(--text-dark);
         }
 
         .status-hero {
@@ -249,16 +415,36 @@
         }
 
         .status-text {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 700;
             margin-bottom: 8px;
-            color: var(--text);
             text-transform: uppercase;
-            border: 4px solid var(--text);
             padding: 16px 24px;
             border-radius: 12px;
             width: 100%;
             max-width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: clip;
+        }
+
+        body[data-theme="light"] .status-text {
+            color: var(--text-light);
+            background: transparent;
+            border: 4px solid var(--text-light);
+        }
+
+        body:not([data-theme="light"]) .status-text {
+            color: var(--text-dark);
+            background: transparent;
+            border: 4px solid var(--text-dark);
+        }
+
+        @media (max-width: 480px) {
+            .status-text {
+                font-size: 10px;
+                padding: 12px 16px;
+            }
         }
 
         .expand-btn {
@@ -273,8 +459,8 @@
 
         .timeline-time-display {
             text-align: center;
-            font-size: 13px;
-            font-weight: 700;
+            font-size: 14px;
+            font-weight: 900;
             margin-bottom: 8px;
             margin-top: 0;
             min-height: 50px;
@@ -285,21 +471,34 @@
             overflow: visible;
             text-overflow: clip;
             text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width: 480px) {
+            .timeline-time-display {
+                font-size: 10px;
+                padding: 10px 4px;
+            }
         }
 
         .timeline-time-display.status-off {
-            color: var(--accent-red);
-            border: 4px solid var(--accent-red);
+            background: var(--accent-red);
+            color: #8b1717;
+            border: 2px solid #8b1717;
         }
 
         .timeline-time-display.status-on {
-            color: var(--accent-green);
-            border: 4px solid var(--accent-green);
+            background: var(--accent-green);
+            color: #176b3d;
+            border: 2px solid #176b3d;
         }
 
         .timeline-time-display.status-maybe {
-            color: var(--accent-yellow);
-            border: 4px solid var(--accent-yellow);
+            background: var(--accent-yellow);
+            color: #a89301;
+            border: 2px solid #a89301;
         }
 
         .day-section {
@@ -335,8 +534,15 @@
             height: 0;
             border-left: 22px solid transparent;
             border-right: 22px solid transparent;
-            border-bottom: 37px solid var(--text);
             margin: 0 auto;
+        }
+
+        body[data-theme="light"] .timeline-pointer-triangle {
+            border-bottom: 37px solid var(--text-light);
+        }
+
+        body:not([data-theme="light"]) .timeline-pointer-triangle {
+            border-bottom: 37px solid var(--text-dark);
         }
 
         .timeline-pointer-line {
@@ -349,10 +555,9 @@
 
         .timeline {
             display: flex;
-            height: 60px;
+            height: 42px;
             position: relative;
-            border-radius: 4px;
-            overflow: hidden;
+            gap: 2px;
         }
 
         .timeline-segment {
@@ -365,6 +570,7 @@
             transition: opacity 0.2s;
             position: relative;
             cursor: pointer;
+            border-radius: 2px;
         }
 
         .timeline-segment:hover {
@@ -422,14 +628,47 @@
         .offline-banner {
             display: none;
             background: var(--accent-yellow);
-            color: var(--bg);
             text-align: center;
             padding: 12px;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        body[data-theme="light"] .offline-banner {
+            color: var(--bg-light);
+        }
+
+        body:not([data-theme="light"]) .offline-banner {
+            color: var(--bg-dark);
         }
 
         .offline-banner.visible {
+            display: block;
+        }
+
+        .offline-notice {
+            display: none;
+            background: var(--accent-yellow);
+            text-align: center;
+            padding: 12px 16px;
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: 8px;
+            margin-top: 16px;
+            line-height: 1.5;
+            text-transform: uppercase;
+        }
+
+        body[data-theme="light"] .offline-notice {
+            color: var(--bg-light);
+        }
+
+        body:not([data-theme="light"]) .offline-notice {
+            color: var(--bg-dark);
+        }
+
+        .offline-notice.visible {
             display: block;
         }
 
@@ -438,12 +677,8 @@
                 grid-template-columns: repeat(4, 1fr);
             }
 
-            .status-text {
-                font-size: 16px;
-            }
-
             .timeline {
-                height: 50px;
+                height: 35px;
             }
 
             .logo {
@@ -454,9 +689,14 @@
                 font-size: 10px;
             }
 
-            .timeline-time-display {
+            .search-input {
+                font-size: 12px;
+                padding: 10px 12px;
+            }
+
+            .offline-notice {
                 font-size: 10px;
-                padding: 10px 4px;
+                padding: 10px 12px;
             }
         }
     </style>
@@ -471,6 +711,11 @@
         <div class="queue-selection" id="queueSelection">
             <div class="logo">МИКОЛАЇВОБЛЕНЕРГО</div>
             <h1>Оберіть вашу чергу щоб перевірити статус</h1>
+            
+            <div class="search-wrapper">
+                <input type="text" class="search-input" id="searchInput" placeholder="або скористайтеся пошуком за адресою">
+                <div class="search-suggestions" id="searchSuggestions"></div>
+            </div>
             
             <div class="queue-grid">
                 <button class="queue-btn" data-queue="1.1">1.1</button>
@@ -493,6 +738,10 @@
                     <div class="toggle-slider"></div>
                 </div>
             </label>
+
+            <div class="offline-notice" id="offlineNotice">
+                Ви офлайн і зараз бачите розклад, актуальне на <span id="cacheTime"></span>. Якщо розклад змінився, ви побачите це коли будете онлайн.
+            </div>
         </div>
 
         <!-- Статус -->
@@ -578,6 +827,22 @@
             }
         };
 
+        // Мапа адрес до черг (приклад - потрібно буде заповнити реальними даними)
+        const ADDRESS_TO_QUEUE = {
+            'центральна': '1.1',
+            'соборна': '1.2',
+            'миколаївська': '2.1',
+            'адміральська': '2.2',
+            'фалєєвська': '3.1',
+            'потьомкінська': '3.2',
+            'велика морська': '4.1',
+            'спаська': '4.2',
+            'московська': '5.1',
+            'чкалова': '5.2',
+            'лягіна': '6.1',
+            'декабристів': '6.2'
+        };
+
         // Стан
         let currentQueue = null;
         let scheduleData = null;
@@ -589,7 +854,6 @@
         const queueSelection = document.getElementById('queueSelection');
         const statusView = document.getElementById('statusView');
         const queueButtons = document.querySelectorAll('.queue-btn');
-        const toggleSwitch = document.getElementById('toggleSwitch');
         const backBtn = document.getElementById('backBtn');
         const backBtnText = document.getElementById('backBtnText');
         const scheduleTimeline = document.getElementById('scheduleTimeline');
@@ -600,47 +864,86 @@
         const todayTimeline = document.getElementById('todayTimeline');
         const todayLabelsTop = document.getElementById('todayLabelsTop');
         const offlineBanner = document.getElementById('offlineBanner');
+        const offlineNotice = document.getElementById('offlineNotice');
+        const cacheTime = document.getElementById('cacheTime');
+        const searchInput = document.getElementById('searchInput');
+        const searchSuggestions = document.getElementById('searchSuggestions');
 
         // Тема в залежності від наявності світла
         function updateTheme(hasLight) {
-            document.documentElement.setAttribute('data-theme', hasLight ? 'light' : 'dark');
+            document.body.setAttribute('data-theme', hasLight ? 'light' : 'dark');
         }
+
+        // За замовчуванням темна тема
+        document.body.setAttribute('data-theme', 'dark');
 
         // Ініціалізація
         function init() {
+            // Перевірка offline
+            updateOfflineStatus();
+
             // Перевірка збережених даних
             const saved = localStorage.getItem('selectedQueue');
             if (saved) {
                 currentQueue = saved;
-                toggleSwitch.classList.add('active');
-                loadScheduleData().then(() => {
-                    showStatus();
-                });
+                
+                // Спробувати завантажити з кешу
+                const cached = localStorage.getItem('scheduleCache');
+                if (cached) {
+                    try {
+                        const cacheData = JSON.parse(cached);
+                        if (cacheData.queue === currentQueue) {
+                            scheduleData = cacheData.schedule;
+                            showStatus();
+                            updateCacheTimeDisplay(cacheData.timestamp);
+                        }
+                    } catch (e) {
+                        console.error('Помилка читання кешу:', e);
+                    }
+                }
+                
+                // Завантажити свіжі дані якщо онлайн
+                if (navigator.onLine) {
+                    loadScheduleData().then(() => {
+                        showStatus();
+                    });
+                }
             } else {
                 // Показуємо екран вибору черги
                 queueSelection.style.display = 'flex';
                 statusView.classList.remove('active');
             }
+        }
 
-            // Перевірка offline
+        // Оновлення статусу offline
+        function updateOfflineStatus() {
             if (!navigator.onLine) {
                 offlineBanner.classList.add('visible');
+                offlineNotice.classList.add('visible');
+            } else {
+                offlineBanner.classList.remove('visible');
+                offlineNotice.classList.remove('visible');
             }
         }
 
-        // Тумблер
-        toggleSwitch.addEventListener('click', () => {
-            toggleSwitch.classList.toggle('active');
-        });
+        // Оновлення часу кешу
+        function updateCacheTimeDisplay(timestamp) {
+            if (!navigator.onLine && timestamp) {
+                const date = new Date(timestamp);
+                const timeStr = date.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
+                const dateStr = date.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
+                cacheTime.textContent = `${dateStr} ${timeStr}`;
+                offlineNotice.classList.add('visible');
+            }
+        }
 
         // Вибір черги
         queueButtons.forEach(btn => {
             btn.addEventListener('click', () => {
                 currentQueue = btn.dataset.queue;
                 
-                if (toggleSwitch.classList.contains('active')) {
-                    localStorage.setItem('selectedQueue', currentQueue);
-                }
+                // Автоматично зберігаємо вибір
+                localStorage.setItem('selectedQueue', currentQueue);
 
                 loadScheduleData().then(() => {
                     showStatus();
@@ -652,6 +955,8 @@
         backBtn.addEventListener('click', () => {
             queueSelection.style.display = 'block';
             statusView.classList.remove('active');
+            // Завжди встановлюємо темну тему на екрані вибору черги
+            document.body.setAttribute('data-theme', 'dark');
         });
 
         // Завантаження даних
@@ -735,7 +1040,7 @@
                 } else {
                     if (scheduleData.tomorrow && scheduleData.tomorrow.length > 0) {
                         const tomorrowFirst = scheduleData.tomorrow[0][0];
-                        statusText.textContent = `Світло є, наступне відключення завтра о ${formatTime(tomorrowFirst)}`;
+                        statusText.textContent = `Світло є, наступне відключення о ${formatTime(tomorrowFirst)}`;
                     } else {
                         statusText.textContent = `Світло є`;
                     }
@@ -849,6 +1154,13 @@
                     segment.classList.add('current-time');
                 }
                 
+                // Додаємо обробник кліку на сегмент
+                segment.addEventListener('click', (e) => {
+                    // Знаходимо центр сегмента
+                    const segmentCenter = (seg.start + seg.end) / 2;
+                    updatePointerPosition(segmentCenter);
+                });
+                
                 timeline.appendChild(segment);
             });
             
@@ -947,17 +1259,109 @@
             }
         }
 
+        // Пошук по адресі
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            
+            // Очистити всі підсвічування
+            queueButtons.forEach(btn => {
+                btn.classList.remove('highlight-on', 'highlight-off', 'highlight-maybe');
+            });
+            
+            if (searchTerm.length === 0) {
+                searchSuggestions.classList.remove('visible');
+                searchSuggestions.innerHTML = '';
+                return;
+            }
+            
+            // Знайти відповідні адреси
+            const matches = [];
+            for (const [address, queue] of Object.entries(ADDRESS_TO_QUEUE)) {
+                if (address.includes(searchTerm)) {
+                    matches.push({ address, queue });
+                }
+            }
+            
+            if (matches.length > 0) {
+                searchSuggestions.innerHTML = '';
+                matches.forEach(match => {
+                    const item = document.createElement('div');
+                    item.className = 'suggestion-item';
+                    item.textContent = `${match.address} (черга ${match.queue})`;
+                    item.addEventListener('click', () => {
+                        highlightQueue(match.queue);
+                        searchInput.value = match.address;
+                        searchSuggestions.classList.remove('visible');
+                    });
+                    searchSuggestions.appendChild(item);
+                });
+                searchSuggestions.classList.add('visible');
+            } else {
+                searchSuggestions.classList.remove('visible');
+                searchSuggestions.innerHTML = '';
+            }
+        });
+
+        // Закрити випадаючий список при кліку поза ним
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-wrapper')) {
+                searchSuggestions.classList.remove('visible');
+            }
+        });
+
+        // Функція підсвічування черги
+        function highlightQueue(queueNumber) {
+            // Очистити всі підсвічування
+            queueButtons.forEach(btn => {
+                btn.classList.remove('highlight-on', 'highlight-off', 'highlight-maybe');
+            });
+            
+            // Знайти кнопку черги
+            const queueBtn = document.querySelector(`[data-queue="${queueNumber}"]`);
+            if (queueBtn) {
+                // Визначити поточний статус черги
+                const schedule = DEMO_SCHEDULES[queueNumber];
+                if (schedule) {
+                    const now = new Date();
+                    const currentHour = now.getHours();
+                    
+                    const isOff = schedule.today.some(([start, end]) => currentHour >= start && currentHour < end);
+                    const isMaybe = schedule.today.some(([start, end]) => currentHour === start || currentHour === end - 1);
+                    
+                    if (isOff) {
+                        queueBtn.classList.add(isMaybe ? 'highlight-maybe' : 'highlight-off');
+                    } else {
+                        queueBtn.classList.add('highlight-on');
+                    }
+                    
+                    // Прокрутити до кнопки
+                    queueBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        }
+
         // Offline/Online події
         window.addEventListener('offline', () => {
-            offlineBanner.classList.add('visible');
+            updateOfflineStatus();
+            // Показати час кешу
+            const cached = localStorage.getItem('scheduleCache');
+            if (cached) {
+                try {
+                    const cacheData = JSON.parse(cached);
+                    updateCacheTimeDisplay(cacheData.timestamp);
+                } catch (e) {
+                    console.error('Помилка читання кешу:', e);
+                }
+            }
         });
 
         window.addEventListener('online', () => {
-            offlineBanner.classList.remove('visible');
+            updateOfflineStatus();
             // Оновити дані
             if (currentQueue) {
-                loadScheduleData();
-                showStatus();
+                loadScheduleData().then(() => {
+                    showStatus();
+                });
             }
         });
 
