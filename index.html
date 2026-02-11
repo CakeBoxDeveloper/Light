@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Графік відключень — Миколаївобленерго</title>
+    <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/CakeBoxDeveloper/Light/f40cee99e11b0c33edb613ca7ff056d6094e8e0d/2424.svg">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
     <style>
         * {
@@ -49,16 +50,29 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            gap: 0;
         }
 
         .logo {
             font-size: 28px;
             font-weight: 700;
             letter-spacing: 1px;
-            margin-bottom: 40px;
+            margin-bottom: 12px;
             text-align: center;
-            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-sizing: border-box;
             width: 100%;
+            max-width: 440px;
+        }
+
+        .logo-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+            object-fit: contain;
         }
 
         body[data-theme="light"] .logo {
@@ -67,6 +81,15 @@
 
         body:not([data-theme="light"]) .logo {
             color: var(--text-dark);
+        }
+
+        /* Фільтр для зміни кольору SVG іконки */
+        body[data-theme="light"] .logo-icon {
+            filter: brightness(0) saturate(100%) invert(62%) sepia(9%) saturate(456%) hue-rotate(358deg) brightness(92%) contrast(87%);
+        }
+
+        body:not([data-theme="light"]) .logo-icon {
+            filter: brightness(0) saturate(100%) invert(45%) sepia(7%) saturate(1015%) hue-rotate(233deg) brightness(95%) contrast(88%);
         }
 
         .pointing-title {
@@ -80,11 +103,15 @@
         h1 {
             font-size: 14px;
             font-weight: 600;
-            margin: 0 0 16px 0;
+            margin: 0 0 12px 0;
             text-transform: uppercase;
-            white-space: nowrap;
             text-align: center;
+            display: block;
+            box-sizing: border-box;
             width: 100%;
+            max-width: 440px;
+            word-wrap: break-word;
+            white-space: normal;
         }
 
         body[data-theme="light"] h1 {
@@ -95,9 +122,32 @@
             color: var(--text-dark);
         }
 
+        .subtitle {
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0 0 12px 0;
+            text-transform: uppercase;
+            text-align: center;
+            display: block;
+            box-sizing: border-box;
+            width: 100%;
+            max-width: 440px;
+        }
+
+        body[data-theme="light"] .subtitle {
+            color: var(--text-light);
+        }
+
+        body:not([data-theme="light"]) .subtitle {
+            color: var(--text-dark);
+        }
+
         .search-wrapper {
             position: relative;
+            box-sizing: border-box;
             width: 100%;
+            max-width: 440px;
+            margin-bottom: 12px;
         }
 
         .search-input {
@@ -106,7 +156,7 @@
             font-size: 14px;
             border-radius: 10px;
             background: transparent;
-            margin-bottom: 16px;
+            margin-bottom: 0;
             font-weight: 600;
             text-align: center;
             outline: none;
@@ -127,6 +177,7 @@
         .search-input::placeholder {
             opacity: 0.6;
             text-transform: uppercase;
+            font-weight: 400;
         }
 
         body[data-theme="light"] .search-input::placeholder {
@@ -147,9 +198,10 @@
 
         .search-suggestions {
             position: absolute;
-            width: 100%;
+            width: calc(100% - 32px);
+            left: 16px;
             border-radius: 10px;
-            margin-top: -12px;
+            margin-top: 2px;
             max-height: 200px;
             overflow-y: auto;
             z-index: 100;
@@ -208,9 +260,11 @@
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 8px;
-            margin-bottom: 16px;
-            margin-top: 16px;
+            margin-bottom: 0;
+            margin-top: 0;
             width: 100%;
+            max-width: 440px;
+            box-sizing: border-box;
         }
 
         .queue-btn {
@@ -417,7 +471,7 @@
         .status-text {
             font-size: 16px;
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             text-transform: uppercase;
             padding: 16px 24px;
             border-radius: 12px;
@@ -453,7 +507,7 @@
 
         /* Таймлайн */
         .schedule-timeline {
-            margin-top: 8px;
+            margin-top: 0;
             position: relative;
         }
 
@@ -461,7 +515,7 @@
             text-align: center;
             font-size: 14px;
             font-weight: 900;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             margin-top: 0;
             min-height: 50px;
             opacity: 1;
@@ -530,19 +584,27 @@
         }
 
         .timeline-pointer-triangle {
-            width: 0;
-            height: 0;
-            border-left: 22px solid transparent;
-            border-right: 22px solid transparent;
+            width: 32px;
+            height: 32px;
             margin: 0 auto;
+            background-image: url('https://raw.githubusercontent.com/CakeBoxDeveloper/Light/61c96d1e6b96c43afbe62e5770bdc621dec0d279/lightning-bolt-.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            transform: rotate(-10deg);
+            transition: filter 0.2s;
         }
 
-        body[data-theme="light"] .timeline-pointer-triangle {
-            border-bottom: 37px solid var(--text-light);
+        .timeline-pointer.status-off .timeline-pointer-triangle {
+            filter: brightness(0) saturate(100%) invert(18%) sepia(89%) saturate(3447%) hue-rotate(349deg) brightness(89%) contrast(95%);
         }
 
-        body:not([data-theme="light"]) .timeline-pointer-triangle {
-            border-bottom: 37px solid var(--text-dark);
+        .timeline-pointer.status-on .timeline-pointer-triangle {
+            filter: brightness(0) saturate(100%) invert(44%) sepia(48%) saturate(1067%) hue-rotate(101deg) brightness(94%) contrast(87%);
+        }
+
+        .timeline-pointer.status-maybe .timeline-pointer-triangle {
+            filter: brightness(0) saturate(100%) invert(84%) sepia(67%) saturate(1677%) hue-rotate(359deg) brightness(101%) contrast(98%);
         }
 
         .timeline-pointer-line {
@@ -557,7 +619,7 @@
             display: flex;
             height: 42px;
             position: relative;
-            gap: 2px;
+            gap: 4px;
         }
 
         .timeline-segment {
@@ -709,13 +771,17 @@
     <div class="container">
         <!-- Вибір черги -->
         <div class="queue-selection" id="queueSelection">
-            <div class="logo">МИКОЛАЇВОБЛЕНЕРГО</div>
-            <h1>Оберіть вашу чергу щоб перевірити статус</h1>
+            <div class="logo">
+                <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/Light/f40cee99e11b0c33edb613ca7ff056d6094e8e0d/2424.svg" alt="Logo" class="logo-icon">
+                <span>МИКОЛАЇВОБЛЕНЕРГО</span>
+            </div>
             
             <div class="search-wrapper">
-                <input type="text" class="search-input" id="searchInput" placeholder="або скористайтеся пошуком за адресою">
+                <input type="text" class="search-input" id="searchInput" placeholder="введіть адресу щоб дізнатися свою чергу">
                 <div class="search-suggestions" id="searchSuggestions"></div>
             </div>
+            
+            <h1>або можете обрати свою чергу самостійно</h1>
             
             <div class="queue-grid">
                 <button class="queue-btn" data-queue="1.1">1.1</button>
@@ -740,7 +806,7 @@
             </label>
 
             <div class="offline-notice" id="offlineNotice">
-                Ви офлайн і зараз бачите розклад, актуальне на <span id="cacheTime"></span>. Якщо розклад змінився, ви побачите це коли будете онлайн.
+                Ви офлайн і зараз бачите розклад, актуальний на <span id="cacheTime"></span>. Якщо розклад змінився, ви побачите це коли будете онлайн. Просто оновіть сторінку, коли з'явиться інтернет.
             </div>
         </div>
 
@@ -828,6 +894,9 @@
         };
 
         // Мапа адрес до черг (приклад - потрібно буде заповнити реальними даними)
+        // TODO: Інтеграція з Google Maps API для точних адрес
+        // TODO: Інтеграція з API https://off.energy.mk.ua для реальних графіків
+        // Зараз використовуються демо-дані для тестування
         const ADDRESS_TO_QUEUE = {
             'центральна': '1.1',
             'соборна': '1.2',
@@ -946,7 +1015,15 @@
                 localStorage.setItem('selectedQueue', currentQueue);
 
                 loadScheduleData().then(() => {
-                    showStatus();
+                    if (scheduleData) {
+                        showStatus();
+                    }
+                }).catch(error => {
+                    console.error('Помилка завантаження даних:', error);
+                    // Все одно показуємо статус з демо-даними
+                    if (scheduleData) {
+                        showStatus();
+                    }
                 });
             });
         });
@@ -961,6 +1038,18 @@
 
         // Завантаження даних
         async function loadScheduleData() {
+            // Спочатку перевіряємо кеш
+            const cached = localStorage.getItem('scheduleCache');
+            let cacheData = null;
+            
+            if (cached) {
+                try {
+                    cacheData = JSON.parse(cached);
+                } catch (e) {
+                    console.error('Помилка читання кешу:', e);
+                }
+            }
+            
             try {
                 // Спроба завантажити з API
                 const response = await fetch(`${API_URL}/api/schedule?queue=${encodeURIComponent(currentQueue)}`);
@@ -972,18 +1061,36 @@
                     throw new Error('API недоступний');
                 }
             } catch (error) {
-                console.log('Використовуємо демо-дані:', error);
-                // Використовуємо демо-дані
-                scheduleData = DEMO_SCHEDULES[currentQueue];
+                console.log('Не вдалося завантажити з API:', error);
+                
+                // Використовуємо кешовані дані якщо є
+                if (cacheData && cacheData.queue === currentQueue) {
+                    scheduleData = cacheData.schedule;
+                    console.log('Використовуємо кешовані дані');
+                } else {
+                    // Якщо кешу немає - використовуємо демо-дані
+                    scheduleData = DEMO_SCHEDULES[currentQueue];
+                    console.log('Використовуємо демо-дані');
+                }
             }
             
-            // Зберігаємо в localStorage
-            const cacheData = {
-                queue: currentQueue,
-                schedule: scheduleData,
-                timestamp: Date.now()
-            };
-            localStorage.setItem('scheduleCache', JSON.stringify(cacheData));
+            // Переконуємося що scheduleData визначено
+            if (!scheduleData) {
+                scheduleData = DEMO_SCHEDULES[currentQueue] || {
+                    today: [[0, 6], [12, 18]],
+                    tomorrow: [[0, 6], [12, 18]]
+                };
+            }
+            
+            // Зберігаємо в localStorage тільки якщо завантажили нові дані
+            if (scheduleData && scheduleData !== cacheData?.schedule) {
+                const newCacheData = {
+                    queue: currentQueue,
+                    schedule: scheduleData,
+                    timestamp: Date.now()
+                };
+                localStorage.setItem('scheduleCache', JSON.stringify(newCacheData));
+            }
             
             return scheduleData;
         }
@@ -1256,6 +1363,9 @@
                 const timeText = `${statusText} з ${formatTime(currentSegment.start)} по ${formatTime(currentSegment.end)}`;
                 timelineTimeDisplay.textContent = timeText;
                 timelineTimeDisplay.className = 'timeline-time-display status-' + currentSegment.status;
+                
+                // Додаємо клас статусу до вказівника
+                pointer.className = 'timeline-pointer status-' + currentSegment.status;
             }
         }
 
@@ -1287,7 +1397,7 @@
                 matches.forEach(match => {
                     const item = document.createElement('div');
                     item.className = 'suggestion-item';
-                    item.textContent = `${match.address} (черга ${match.queue})`;
+                    item.textContent = match.address;
                     item.addEventListener('click', () => {
                         highlightQueue(match.queue);
                         searchInput.value = match.address;
