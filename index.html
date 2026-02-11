@@ -38,6 +38,7 @@
             width: 100%;
             margin: 0 auto;
             padding: 20px;
+            overflow-x: hidden;
         }
 
         /* Вибір черги */
@@ -45,28 +46,39 @@
             text-align: center;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            align-items: stretch;
         }
 
         .logo {
-            font-size: 16px;
+            font-size: 20px;
             font-weight: 700;
             letter-spacing: 1px;
             margin-bottom: 40px;
             color: var(--text);
             text-align: center;
+            width: 100vw;
+            margin-left: calc(-50vw + 50%);
+            margin-right: calc(-50vw + 50%);
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+
+        .pointing-title {
+            display: none;
         }
 
         .pointing-image {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 20px;
+            display: none;
         }
 
         h1 {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
-            margin-bottom: 16px;
+            margin: 0 0 16px 0;
+            text-transform: uppercase;
+            white-space: normal;
+            text-align: center;
+            align-self: stretch;
         }
 
         .queue-grid {
@@ -74,6 +86,8 @@
             grid-template-columns: repeat(4, 1fr);
             gap: 8px;
             margin-bottom: 16px;
+            margin-top: 16px;
+            align-self: stretch;
         }
 
         .queue-btn {
@@ -113,6 +127,8 @@
             background: var(--text);
             border: none;
             border-radius: 10px;
+            text-transform: uppercase;
+            align-self: stretch;
         }
 
         .toggle-switch {
@@ -173,8 +189,12 @@
         }
 
         .back-btn-arrow {
-            font-size: 24px;
+            font-size: 48px;
             font-weight: 900;
+            line-height: 0.8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .back-btn-queue {
@@ -187,7 +207,7 @@
 
         .status-hero {
             text-align: center;
-            padding: 40px 0 20px;
+            padding: 40px 0 0;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -234,7 +254,7 @@
         .status-text {
             font-size: 18px;
             font-weight: 700;
-            margin-bottom: 10px;
+            margin-bottom: 0;
             color: var(--text);
             text-transform: uppercase;
             border: 4px solid var(--text);
@@ -250,7 +270,39 @@
 
         /* Таймлайн */
         .schedule-timeline {
-            margin-top: 32px;
+            margin-top: 0;
+            position: relative;
+        }
+
+        .timeline-time-display {
+            text-align: center;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            margin-top: 0;
+            min-height: 50px;
+            opacity: 1;
+            padding: 12px 16px;
+            border-radius: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-transform: uppercase;
+        }
+
+        .timeline-time-display.status-off {
+            color: var(--accent-red);
+            border: 4px solid var(--accent-red);
+        }
+
+        .timeline-time-display.status-on {
+            color: var(--accent-green);
+            border: 4px solid var(--accent-green);
+        }
+
+        .timeline-time-display.status-maybe {
+            color: var(--accent-yellow);
+            border: 4px solid var(--accent-yellow);
         }
 
         .day-section {
@@ -264,6 +316,34 @@
         .timeline-container {
             position: relative;
             padding: 0;
+            padding-bottom: 40px;
+        }
+
+        .timeline-pointer {
+            position: absolute;
+            bottom: -5px;
+            transform: translateX(-50%);
+            cursor: grab;
+            z-index: 20;
+            user-select: none;
+            touch-action: none;
+        }
+
+        .timeline-pointer:active {
+            cursor: grabbing;
+        }
+
+        .timeline-pointer-triangle {
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 25px solid var(--text);
+            margin: 0 auto;
+        }
+
+        .timeline-pointer-line {
+            display: none;
         }
 
         .timeline-labels-top {
@@ -295,21 +375,7 @@
         }
 
         .timeline-segment-label {
-            position: absolute;
-            bottom: calc(100% + 12px);
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 12px;
-            font-weight: 600;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s;
-            z-index: 10;
-        }
-
-        .timeline-segment.active .timeline-segment-label {
-            opacity: 1;
+            display: none;
         }
 
         .timeline-segment.off {
@@ -334,6 +400,21 @@
 
         .timeline-segment.maybe .timeline-segment-label {
             color: var(--accent-yellow);
+        }
+
+        .timeline-segment.current-time {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.3;
+                transform: scale(1.02);
+            }
         }
 
         .legend {
@@ -379,7 +460,6 @@
         <!-- Вибір черги -->
         <div class="queue-selection" id="queueSelection">
             <div class="logo">МИКОЛАЇВОБЛЕНЕРГО</div>
-            <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/People/Backhand%20Index%20Pointing%20Down.webp" alt="👇" class="pointing-image">
             <h1>Оберіть вашу чергу щоб перевірити статус</h1>
             
             <div class="queue-grid">
@@ -408,7 +488,7 @@
         <!-- Статус -->
         <div class="status-view" id="statusView">
             <button class="back-btn" id="backBtn">
-                <span class="back-btn-arrow">←</span>
+                <span class="back-btn-arrow">‹</span>
                 <span class="back-btn-queue" id="backBtnText">Змінити чергу</span>
             </button>
             
@@ -420,6 +500,7 @@
             </div>
 
             <div class="schedule-timeline" id="scheduleTimeline">
+                <div class="timeline-time-display" id="timelineTimeDisplay"></div>
                 <div class="day-section">
                     <div class="day-title" id="todayTitle">Сьогодні</div>
                     <div class="timeline-container">
@@ -491,6 +572,8 @@
         let currentQueue = null;
         let scheduleData = null;
         let lottieAnimation = null;
+        let isDragging = false;
+        let timelineSegments = [];
 
         // Елементи
         const queueSelection = document.getElementById('queueSelection');
@@ -500,6 +583,7 @@
         const backBtn = document.getElementById('backBtn');
         const backBtnText = document.getElementById('backBtnText');
         const scheduleTimeline = document.getElementById('scheduleTimeline');
+        const timelineTimeDisplay = document.getElementById('timelineTimeDisplay');
         const statusIndicator = document.getElementById('statusIndicator');
         const lottieContainer = document.getElementById('lottieContainer');
         const statusText = document.getElementById('statusText');
@@ -681,6 +765,13 @@
         function renderTimeline(timeline, labelsContainer, schedule) {
             timeline.innerHTML = '';
             labelsContainer.innerHTML = '';
+            timelineSegments = [];
+            
+            // Видаляємо старий вказівник якщо є
+            const oldPointer = document.getElementById('timelinePointer');
+            if (oldPointer) {
+                oldPointer.remove();
+            }
             
             // Групуємо години за статусом для створення сегментів
             const segments = [];
@@ -720,41 +811,122 @@
                 });
             }
             
+            timelineSegments = segments;
+            
+            // Поточний час
+            const now = new Date();
+            const currentHour = now.getHours();
+            const currentMinute = now.getMinutes();
+            const currentTimeDecimal = currentHour + currentMinute / 60;
+            
             // Створюємо сегменти таймлайну
-            segments.forEach(seg => {
+            segments.forEach((seg, index) => {
                 const segment = document.createElement('div');
                 segment.className = `timeline-segment ${seg.status}`;
                 segment.style.flex = seg.end - seg.start;
+                segment.dataset.segmentIndex = index;
                 
-                const label = document.createElement('div');
-                label.className = 'timeline-segment-label';
-                label.textContent = `${formatTime(seg.start)}-${formatTime(seg.end)}`;
-                segment.appendChild(label);
-                
-                // Клік для показу/приховування мітки
-                segment.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    
-                    // Якщо цей сегмент вже активний - приховати
-                    if (this.classList.contains('active')) {
-                        this.classList.remove('active');
-                    } else {
-                        // Прибрати active з усіх сегментів
-                        document.querySelectorAll('.timeline-segment').forEach(s => s.classList.remove('active'));
-                        // Додати active до поточного
-                        this.classList.add('active');
-                    }
-                });
+                // Додаємо клас для поточного часу
+                if (currentTimeDecimal >= seg.start && currentTimeDecimal < seg.end) {
+                    segment.classList.add('current-time');
+                }
                 
                 timeline.appendChild(segment);
             });
             
-            // Клік поза сегментами приховує всі мітки
-            document.addEventListener('click', function(e) {
-                if (!e.target.closest('.timeline-segment')) {
-                    document.querySelectorAll('.timeline-segment').forEach(s => s.classList.remove('active'));
+            // Створюємо вказівник
+            const pointer = document.createElement('div');
+            pointer.className = 'timeline-pointer';
+            pointer.id = 'timelinePointer';
+            pointer.innerHTML = `
+                <div class="timeline-pointer-triangle"></div>
+            `;
+            
+            timeline.parentElement.appendChild(pointer);
+            
+            // Встановлюємо вказівник на поточний час
+            updatePointerPosition(currentTimeDecimal);
+            
+            // Додаємо обробники для перетягування
+            let startX = 0;
+            let startLeft = 0;
+            
+            pointer.addEventListener('mousedown', startDrag);
+            pointer.addEventListener('touchstart', startDrag);
+            
+            function startDrag(e) {
+                isDragging = true;
+                startX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
+                const rect = timeline.getBoundingClientRect();
+                startLeft = pointer.offsetLeft;
+                
+                document.addEventListener('mousemove', drag);
+                document.addEventListener('touchmove', drag);
+                document.addEventListener('mouseup', stopDrag);
+                document.addEventListener('touchend', stopDrag);
+                
+                e.preventDefault();
+            }
+            
+            function drag(e) {
+                if (!isDragging) return;
+                
+                const currentX = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
+                const deltaX = currentX - startX;
+                const rect = timeline.getBoundingClientRect();
+                
+                let newLeft = startLeft + deltaX;
+                newLeft = Math.max(0, Math.min(newLeft, rect.width));
+                
+                const timeDecimal = (newLeft / rect.width) * 24;
+                updatePointerPosition(timeDecimal);
+            }
+            
+            function stopDrag() {
+                isDragging = false;
+                document.removeEventListener('mousemove', drag);
+                document.removeEventListener('touchmove', drag);
+                document.removeEventListener('mouseup', stopDrag);
+                document.removeEventListener('touchend', stopDrag);
+            }
+        }
+        
+        // Оновлення позиції вказівника
+        function updatePointerPosition(timeDecimal) {
+            const pointer = document.getElementById('timelinePointer');
+            if (!pointer) return;
+            
+            const timeline = document.getElementById('todayTimeline');
+            const rect = timeline.getBoundingClientRect();
+            
+            const percentage = (timeDecimal / 24) * 100;
+            pointer.style.left = percentage + '%';
+            
+            // Знаходимо сегмент для цього часу
+            let currentSegment = null;
+            let accumulatedHours = 0;
+            
+            for (let seg of timelineSegments) {
+                if (timeDecimal >= seg.start && timeDecimal < seg.end) {
+                    currentSegment = seg;
+                    break;
                 }
-            });
+            }
+            
+            if (currentSegment) {
+                let statusText = '';
+                if (currentSegment.status === 'off') {
+                    statusText = 'Аварійне відключення';
+                } else if (currentSegment.status === 'maybe') {
+                    statusText = 'Можливе відключення';
+                } else {
+                    statusText = 'Заплановане постачання';
+                }
+                
+                const timeText = `${statusText} з ${formatTime(currentSegment.start)} по ${formatTime(currentSegment.end)}`;
+                timelineTimeDisplay.textContent = timeText;
+                timelineTimeDisplay.className = 'timeline-time-display status-' + currentSegment.status;
+            }
         }
 
         // Offline/Online події
