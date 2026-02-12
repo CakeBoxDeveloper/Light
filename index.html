@@ -21,6 +21,8 @@
             --accent-green: #229b59;
             --accent-red: #cd2222;
             --accent-yellow: #edd301;
+            --accent-orange: #ff8c00;
+            --accent-orange-dark: #cc7000;
         }
 
         body {
@@ -112,6 +114,7 @@
             max-width: 440px;
             word-wrap: break-word;
             white-space: normal;
+            padding: 0;
         }
 
         body[data-theme="light"] h1 {
@@ -132,6 +135,7 @@
             box-sizing: border-box;
             width: 100%;
             max-width: 440px;
+            padding: 0;
         }
 
         body[data-theme="light"] .subtitle {
@@ -150,9 +154,19 @@
             margin-bottom: 12px;
         }
 
+        /* Вирівнюємо всі елементи по ширині */
+        .logo,
+        h1,
+        .subtitle,
+        .search-wrapper,
+        .queue-grid {
+            width: 100%;
+            max-width: 440px;
+        }
+
         .search-input {
             width: 100%;
-            padding: 12px 16px;
+            padding: 12px 40px 12px 16px;
             font-size: 14px;
             border-radius: 10px;
             background: transparent;
@@ -162,6 +176,24 @@
             outline: none;
             transition: all 0.2s;
             position: relative;
+        }
+
+        body[data-theme="light"] .search-input {
+            border: 3px solid var(--text-light);
+            color: var(--text-light);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%239B9388' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cpath d='m21 21-4.35-4.35'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 20px 20px;
+        }
+
+        body:not([data-theme="light"]) .search-input {
+            border: 3px solid var(--text-dark);
+            color: var(--text-dark);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236B6874' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cpath d='m21 21-4.35-4.35'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 20px 20px;
         }
 
         body[data-theme="light"] .search-input {
@@ -282,6 +314,14 @@
             position: relative;
         }
 
+        .queue-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .queue-btn:active {
+            transform: translateY(0);
+        }
+
         body[data-theme="light"] .queue-btn {
             background: var(--text-light);
             color: var(--bg-light);
@@ -294,16 +334,33 @@
 
         .queue-btn.highlight-on {
             background: var(--accent-green) !important;
-            color: white !important;
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        body[data-theme="light"] .queue-btn.highlight-on {
+            color: var(--bg-light) !important;
+        }
+
+        body:not([data-theme="light"]) .queue-btn.highlight-on {
+            color: var(--bg-dark) !important;
         }
 
         .queue-btn.highlight-off {
             background: var(--accent-red) !important;
-            color: white !important;
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        body[data-theme="light"] .queue-btn.highlight-off {
+            color: var(--bg-light) !important;
+        }
+
+        body:not([data-theme="light"]) .queue-btn.highlight-off {
+            color: var(--bg-dark) !important;
         }
 
         .queue-btn.highlight-maybe {
             background: var(--accent-yellow) !important;
+            animation: pulse 1s ease-in-out infinite;
         }
 
         body[data-theme="light"] .queue-btn.highlight-maybe {
@@ -382,44 +439,98 @@
             padding: 0;
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            max-width: 440px;
+            height: 48px;
         }
 
-        body[data-theme="light"] .back-btn {
-            color: var(--text-light);
-        }
-
-        body:not([data-theme="light"]) .back-btn {
-            color: var(--text-dark);
-        }
-
-        .back-btn:hover {
-            opacity: 0.8;
-        }
-
-        .back-btn-arrow {
+        .nav-arrow {
             font-size: 48px;
             font-weight: 900;
             line-height: 1;
+            cursor: pointer;
+            transition: transform 0.2s;
+            user-select: none;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-top: -8px;
         }
 
-        .back-btn-queue {
+        body[data-theme="light"] .nav-arrow {
+            color: var(--text-light);
+        }
+
+        body:not([data-theme="light"]) .nav-arrow {
+            color: var(--text-dark);
+        }
+
+        .nav-arrow:hover {
+            transform: scale(1.1);
+        }
+
+        .queue-nav-btn {
             text-transform: uppercase;
-            padding: 8px 16px;
-            border-radius: 8px;
+            padding: 12px 20px;
+            border-radius: 12px;
             font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+            white-space: nowrap;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        body[data-theme="light"] .back-btn-queue {
+        body[data-theme="light"] .queue-nav-btn {
             border: 4px solid var(--text-light);
+            background: transparent;
+            color: var(--text-light);
         }
 
-        body:not([data-theme="light"]) .back-btn-queue {
+        body:not([data-theme="light"]) .queue-nav-btn {
             border: 4px solid var(--text-dark);
+            background: transparent;
+            color: var(--text-dark);
+        }
+
+        .queue-nav-btn:hover {
+            opacity: 0.8;
+        }
+
+        .change-queue-btn {
+            text-transform: uppercase;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 0 0 auto;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        body[data-theme="light"] .change-queue-btn {
+            background: var(--text-light);
+            color: var(--bg-light);
+        }
+
+        body:not([data-theme="light"]) .change-queue-btn {
+            background: var(--text-dark);
+            color: var(--bg-dark);
+        }
+
+        .change-queue-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
         }
 
         .status-hero {
@@ -460,13 +571,7 @@
             object-fit: contain;
         }
 
-        .status-indicator.on {
-            /* Лампочка */
-        }
 
-        .status-indicator.off {
-            /* Лотті анімація */
-        }
 
         .status-text {
             font-size: 16px;
@@ -540,19 +645,19 @@
         .timeline-time-display.status-off {
             background: var(--accent-red);
             color: #8b1717;
-            border: 2px solid #8b1717;
+            border: 4px solid #8b1717;
         }
 
         .timeline-time-display.status-on {
             background: var(--accent-green);
             color: #176b3d;
-            border: 2px solid #176b3d;
+            border: 4px solid #176b3d;
         }
 
         .timeline-time-display.status-maybe {
             background: var(--accent-yellow);
             color: #a89301;
-            border: 2px solid #a89301;
+            border: 4px solid #a89301;
         }
 
         .day-section {
@@ -571,7 +676,7 @@
 
         .timeline-pointer {
             position: absolute;
-            bottom: -5px;
+            bottom: -10px;
             transform: translateX(-50%);
             cursor: grab;
             z-index: 20;
@@ -584,8 +689,8 @@
         }
 
         .timeline-pointer-triangle {
-            width: 32px;
-            height: 32px;
+            width: 40px;
+            height: 40px;
             margin: 0 auto;
             background-image: url('https://raw.githubusercontent.com/CakeBoxDeveloper/Light/61c96d1e6b96c43afbe62e5770bdc621dec0d279/lightning-bolt-.svg');
             background-size: contain;
@@ -604,7 +709,7 @@
         }
 
         .timeline-pointer.status-maybe .timeline-pointer-triangle {
-            filter: brightness(0) saturate(100%) invert(84%) sepia(67%) saturate(1677%) hue-rotate(359deg) brightness(101%) contrast(98%);
+            filter: brightness(0) saturate(100%) invert(88%) sepia(45%) saturate(1677%) hue-rotate(1deg) brightness(101%) contrast(98%);
         }
 
         .timeline-pointer-line {
@@ -689,7 +794,7 @@
         /* Offline banner */
         .offline-banner {
             display: none;
-            background: var(--accent-yellow);
+            background: var(--accent-orange);
             text-align: center;
             padding: 12px;
             font-size: 14px;
@@ -711,15 +816,16 @@
 
         .offline-notice {
             display: none;
-            background: var(--accent-yellow);
+            background: var(--accent-orange);
             text-align: center;
             padding: 12px 16px;
             font-size: 12px;
             font-weight: 700;
             border-radius: 8px;
-            margin-top: 16px;
+            margin-top: 24px;
             line-height: 1.5;
             text-transform: uppercase;
+            border: 4px solid var(--accent-orange-dark);
         }
 
         body[data-theme="light"] .offline-notice {
@@ -732,6 +838,10 @@
 
         .offline-notice.visible {
             display: block;
+        }
+
+        #offlineNoticeStatus {
+            margin-top: 24px;
         }
 
         @media (max-width: 640px) {
@@ -812,10 +922,13 @@
 
         <!-- Статус -->
         <div class="status-view" id="statusView">
-            <button class="back-btn" id="backBtn">
-                <span class="back-btn-arrow">‹</span>
-                <span class="back-btn-queue" id="backBtnText">Змінити чергу</span>
-            </button>
+            <div class="back-btn" id="backBtn">
+                <span class="nav-arrow" id="prevArrow">‹</span>
+                <button class="queue-nav-btn" id="currentQueueBtn">Черга 1.1</button>
+                <button class="change-queue-btn" id="changeQueueBtn">Меню</button>
+                <button class="queue-nav-btn" id="nextQueueBtn">Черга 1.2</button>
+                <span class="nav-arrow" id="nextArrow">›</span>
+            </div>
             
             <div class="status-hero">
                 <div class="status-indicator" id="statusIndicator">
@@ -834,12 +947,38 @@
                     </div>
                 </div>
             </div>
+
+            <div class="offline-notice" id="offlineNoticeStatus">
+                Ви офлайн і зараз бачите розклад, актуальний на <span id="cacheTimeStatus"></span>. Якщо розклад змінився, ви побачите це коли будете онлайн. Просто оновіть сторінку, коли з'явиться інтернет.
+            </div>
         </div>
     </div>
 
     <script>
         // API endpoint
         const API_URL = 'https://off.energy.mk.ua';
+        
+        // Функція для отримання даних безпосередньо з сайту облэнерго
+        async function fetchFromEnergyMkUa(queue) {
+            try {
+                // Спроба завантажити через їхній API
+                const response = await fetch(`${API_URL}/api/outages/schedule?queue=${queue}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    return data;
+                }
+            } catch (error) {
+                console.log('Помилка завантаження з API облэнерго:', error);
+            }
+            
+            return null;
+        }
 
         // Демо-дані графіків (резервні дані)
         const DEMO_SCHEDULES = {
@@ -935,6 +1074,8 @@
         const offlineBanner = document.getElementById('offlineBanner');
         const offlineNotice = document.getElementById('offlineNotice');
         const cacheTime = document.getElementById('cacheTime');
+        const offlineNoticeStatus = document.getElementById('offlineNoticeStatus');
+        const cacheTimeStatus = document.getElementById('cacheTimeStatus');
         const searchInput = document.getElementById('searchInput');
         const searchSuggestions = document.getElementById('searchSuggestions');
 
@@ -948,6 +1089,9 @@
 
         // Ініціалізація
         function init() {
+            // Прелоад всіх зображень для офлайн режиму
+            preloadImages();
+            
             // Перевірка offline
             updateOfflineStatus();
 
@@ -984,14 +1128,42 @@
             }
         }
 
+        // Прелоад зображень
+        function preloadImages() {
+            const images = [
+                'https://raw.githubusercontent.com/CakeBoxDeveloper/Light/f40cee99e11b0c33edb613ca7ff056d6094e8e0d/2424.svg',
+                'https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Objects/Light%20Bulb.webp',
+                'https://raw.githubusercontent.com/CakeBoxDeveloper/Light/61c96d1e6b96c43afbe62e5770bdc621dec0d279/lightning-bolt-.svg'
+            ];
+            
+            images.forEach(src => {
+                const img = new Image();
+                img.src = src;
+            });
+            
+            // Прелоад Lottie анімації
+            if (navigator.onLine) {
+                fetch('https://cdn.changes.tg/gifts/models/Valentine%20Box/lottie/Fuse%20Box.json')
+                    .then(response => response.json())
+                    .then(data => {
+                        localStorage.setItem('lottieAnimation', JSON.stringify(data));
+                    })
+                    .catch(error => {
+                        console.log('Не вдалося завантажити Lottie анімацію:', error);
+                    });
+            }
+        }
+
         // Оновлення статусу offline
         function updateOfflineStatus() {
             if (!navigator.onLine) {
                 offlineBanner.classList.add('visible');
                 offlineNotice.classList.add('visible');
+                offlineNoticeStatus.classList.add('visible');
             } else {
                 offlineBanner.classList.remove('visible');
                 offlineNotice.classList.remove('visible');
+                offlineNoticeStatus.classList.remove('visible');
             }
         }
 
@@ -1002,7 +1174,9 @@
                 const timeStr = date.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
                 const dateStr = date.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
                 cacheTime.textContent = `${dateStr} ${timeStr}`;
+                cacheTimeStatus.textContent = `${dateStr} ${timeStr}`;
                 offlineNotice.classList.add('visible');
+                offlineNoticeStatus.classList.add('visible');
             }
         }
 
@@ -1028,13 +1202,78 @@
             });
         });
 
-        // Повернутися
-        backBtn.addEventListener('click', () => {
+        // Елементи навігації
+        const changeQueueBtn = document.getElementById('changeQueueBtn');
+        const currentQueueBtn = document.getElementById('currentQueueBtn');
+        const nextQueueBtn = document.getElementById('nextQueueBtn');
+        const prevArrow = document.getElementById('prevArrow');
+        const nextArrow = document.getElementById('nextArrow');
+
+        // Список черг
+        const QUEUES = ['1.1', '1.2', '2.1', '2.2', '3.1', '3.2', '4.1', '4.2', '5.1', '5.2', '6.1', '6.2'];
+
+        // Повернутися до вибору черги
+        changeQueueBtn.addEventListener('click', () => {
             queueSelection.style.display = 'block';
             statusView.classList.remove('active');
             // Завжди встановлюємо темну тему на екрані вибору черги
             document.body.setAttribute('data-theme', 'dark');
         });
+
+        // Попередня черга (стрілка та кнопка)
+        function goToPrevQueue() {
+            const currentIndex = QUEUES.indexOf(currentQueue);
+            const prevIndex = currentIndex === 0 ? QUEUES.length - 1 : currentIndex - 1;
+            currentQueue = QUEUES[prevIndex];
+            localStorage.setItem('selectedQueue', currentQueue);
+            loadScheduleData().then(() => {
+                if (scheduleData) {
+                    showStatus();
+                }
+            }).catch(error => {
+                console.error('Помилка завантаження даних:', error);
+                if (scheduleData) {
+                    showStatus();
+                }
+            });
+        }
+
+        prevArrow.addEventListener('click', goToPrevQueue);
+        currentQueueBtn.addEventListener('click', goToPrevQueue);
+
+        // Наступна черга (стрілка та кнопка)
+        function goToNextQueue() {
+            const currentIndex = QUEUES.indexOf(currentQueue);
+            const nextIndex = currentIndex === QUEUES.length - 1 ? 0 : currentIndex + 1;
+            currentQueue = QUEUES[nextIndex];
+            localStorage.setItem('selectedQueue', currentQueue);
+            loadScheduleData().then(() => {
+                if (scheduleData) {
+                    showStatus();
+                }
+            }).catch(error => {
+                console.error('Помилка завантаження даних:', error);
+                if (scheduleData) {
+                    showStatus();
+                }
+            });
+        }
+
+        nextArrow.addEventListener('click', goToNextQueue);
+        nextQueueBtn.addEventListener('click', goToNextQueue);
+
+        // Оновлення стану кнопок навігації
+        function updateNavigationButtons() {
+            const currentIndex = QUEUES.indexOf(currentQueue);
+            
+            // Попередня черга
+            const prevIndex = currentIndex === 0 ? QUEUES.length - 1 : currentIndex - 1;
+            currentQueueBtn.textContent = `Черга ${QUEUES[prevIndex]}`;
+            
+            // Наступна черга
+            const nextIndex = currentIndex === QUEUES.length - 1 ? 0 : currentIndex + 1;
+            nextQueueBtn.textContent = `Черга ${QUEUES[nextIndex]}`;
+        }
 
         // Завантаження даних
         async function loadScheduleData() {
@@ -1051,17 +1290,17 @@
             }
             
             try {
-                // Спроба завантажити з API
-                const response = await fetch(`${API_URL}/api/schedule?queue=${encodeURIComponent(currentQueue)}`);
+                // Спроба завантажити з API облэнерго
+                const energyData = await fetchFromEnergyMkUa(currentQueue);
                 
-                if (response.ok) {
-                    const data = await response.json();
-                    scheduleData = data;
+                if (energyData) {
+                    scheduleData = energyData;
+                    console.log('Завантажено дані з облэнерго');
                 } else {
-                    throw new Error('API недоступний');
+                    throw new Error('API облэнерго недоступний');
                 }
             } catch (error) {
-                console.log('Не вдалося завантажити з API:', error);
+                console.log('Не вдалося завантажити з API облэнерго:', error);
                 
                 // Використовуємо кешовані дані якщо є
                 if (cacheData && cacheData.queue === currentQueue) {
@@ -1127,17 +1366,30 @@
                 lottieContainer.appendChild(img);
             } else {
                 // Показати Lottie анімацію
-                lottieAnimation = lottie.loadAnimation({
-                    container: lottieContainer,
-                    renderer: 'svg',
-                    loop: true,
-                    autoplay: true,
-                    path: 'https://cdn.changes.tg/gifts/models/Valentine%20Box/lottie/Fuse%20Box.json'
-                });
+                // Спробувати завантажити з кешу
+                const cachedLottie = localStorage.getItem('lottieAnimation');
+                
+                if (cachedLottie && !navigator.onLine) {
+                    // Використовуємо кешовану анімацію
+                    try {
+                        const animationData = JSON.parse(cachedLottie);
+                        lottieAnimation = lottie.loadAnimation({
+                            container: lottieContainer,
+                            renderer: 'svg',
+                            loop: true,
+                            autoplay: true,
+                            animationData: animationData
+                        });
+                    } catch (e) {
+                        console.error('Помилка завантаження кешованої анімації:', e);
+                        // Fallback - спробувати завантажити з мережі
+                        loadLottieFromNetwork();
+                    }
+                } else {
+                    // Завантажуємо з мережі
+                    loadLottieFromNetwork();
+                }
             }
-
-            // Оновити текст кнопки "Назад"
-            backBtnText.textContent = `Черга ${currentQueue}`;
 
             // Статус текст в одну строку
             if (hasLight) {
@@ -1163,6 +1415,20 @@
 
             // Побудова таймлайнів
             renderTimeline(todayTimeline, todayLabelsTop, scheduleData.today);
+            
+            // Оновити стан кнопок навігації
+            updateNavigationButtons();
+        }
+
+        // Завантаження Lottie з мережі
+        function loadLottieFromNetwork() {
+            lottieAnimation = lottie.loadAnimation({
+                container: lottieContainer,
+                renderer: 'svg',
+                loop: true,
+                autoplay: true,
+                path: 'https://cdn.changes.tg/gifts/models/Valentine%20Box/lottie/Fuse%20Box.json'
+            });
         }
 
         // Перевірка відключення зараз
