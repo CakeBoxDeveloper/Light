@@ -166,134 +166,9 @@
         .logo,
         h1,
         .subtitle,
-        .search-wrapper,
         .queue-grid {
             width: 100%;
             max-width: 440px;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 12px 40px 12px 16px;
-            font-size: 14px;
-            border-radius: 10px;
-            background: transparent;
-            margin-bottom: 0;
-            font-weight: 600;
-            text-align: center;
-            outline: none;
-            transition: all 0.2s;
-            position: relative;
-        }
-
-        body[data-theme="light"] .search-input {
-            border: 3px solid var(--text-light);
-            color: var(--text-light);
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%239B9388' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cpath d='m21 21-4.35-4.35'%3E%3C/path%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 16px center;
-            background-size: 20px 20px;
-        }
-
-        body:not([data-theme="light"]) .search-input {
-            border: 3px solid var(--text-dark);
-            color: var(--text-dark);
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236B6874' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cpath d='m21 21-4.35-4.35'%3E%3C/path%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 16px center;
-            background-size: 20px 20px;
-        }
-
-        body[data-theme="light"] .search-input {
-            border: 3px solid var(--text-light);
-            color: var(--text-light);
-        }
-
-        body:not([data-theme="light"]) .search-input {
-            border: 3px solid var(--text-dark);
-            color: var(--text-dark);
-        }
-
-        .search-input::placeholder {
-            opacity: 0.6;
-            text-transform: uppercase;
-            font-weight: 400;
-        }
-
-        body[data-theme="light"] .search-input::placeholder {
-            color: var(--text-light);
-        }
-
-        body:not([data-theme="light"]) .search-input::placeholder {
-            color: var(--text-dark);
-        }
-
-        body[data-theme="light"] .search-input:focus {
-            border-color: var(--text-light);
-        }
-
-        body:not([data-theme="light"]) .search-input:focus {
-            border-color: var(--text-dark);
-        }
-
-        .search-suggestions {
-            position: absolute;
-            width: calc(100% - 32px);
-            left: 16px;
-            border-radius: 10px;
-            margin-top: 2px;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 100;
-            display: none;
-        }
-
-        body[data-theme="light"] .search-suggestions {
-            background: var(--text-light);
-            color: var(--bg-light);
-        }
-
-        body:not([data-theme="light"]) .search-suggestions {
-            background: var(--text-dark);
-            color: var(--bg-dark);
-        }
-
-        .search-suggestions.visible {
-            display: block;
-        }
-
-        .suggestion-item {
-            padding: 12px 16px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-weight: 600;
-        }
-
-        body[data-theme="light"] .suggestion-item {
-            border-bottom: 1px solid var(--bg-light);
-        }
-
-        body:not([data-theme="light"]) .suggestion-item {
-            border-bottom: 1px solid var(--bg-dark);
-        }
-
-        .suggestion-item:last-child {
-            border-bottom: none;
-        }
-
-        body[data-theme="light"] .suggestion-item:hover {
-            background: var(--bg-light);
-            color: var(--text-light);
-        }
-
-        body:not([data-theme="light"]) .suggestion-item:hover {
-            background: var(--bg-dark);
-            color: var(--text-dark);
-        }
-
-        .search-wrapper {
-            position: relative;
-            width: 100%;
         }
 
         .queue-grid {
@@ -489,7 +364,8 @@
         .nav-arrow {
             font-size: 48px;
             font-weight: 900;
-            line-height: 1;
+            line-height: 48px;
+            height: 48px;
             cursor: pointer;
             transition: transform 0.2s;
             user-select: none;
@@ -957,12 +833,7 @@
                 <span>МИКОЛАЇВОБЛЕНЕРГО</span>
             </div>
             
-            <div class="search-wrapper">
-                <input type="text" class="search-input" id="searchInput" placeholder="введіть адресу щоб дізнатися свою чергу">
-                <div class="search-suggestions" id="searchSuggestions"></div>
-            </div>
-            
-            <h1>або можете обрати свою чергу самостійно</h1>
+            <h1>Оберіть свою чергу щоб дізнатися чи є світло</h1>
             
             <div class="queue-grid">
                 <button class="queue-btn" data-queue="1.1">1.1</button>
@@ -1275,8 +1146,6 @@
         const cacheTime = document.getElementById('cacheTime');
         const offlineNoticeStatus = document.getElementById('offlineNoticeStatus');
         const cacheTimeStatus = document.getElementById('cacheTimeStatus');
-        const searchInput = document.getElementById('searchInput');
-        const searchSuggestions = document.getElementById('searchSuggestions');
 
         // Тема в залежності від наявності світла
         function updateTheme(hasLight) {
@@ -1625,37 +1494,40 @@
             console.log('hasLight:', hasLight, 'currentHour:', currentHour);
             
             if (hasLight) {
+                // СВІТЛО Є
                 const nextOutage = getNextOutage(scheduleData.today, currentHour);
                 console.log(`nextOutage=${nextOutage}`);
                 
                 if (nextOutage !== null) {
-                    statusText.textContent = `Світло є, вимкнуть о ${formatTime(nextOutage)}`;
+                    // Є дані про відключення сьогодні
+                    const timeStr = formatTime(nextOutage);
+                    statusText.textContent = `Світло є, вимкнуть о ${timeStr}`;
                 } else {
-                    // Немає відключень сьогодні, перевіряємо можливі відключення
-                    const nextMaybe = getNextMaybe(scheduleData.todayMaybe, currentHour);
+                    // Немає відключень сьогодні - перевіряємо maybe
+                    const nextMaybe = getNextMaybe(scheduleData.today, currentHour);
                     console.log(`nextMaybe=${nextMaybe}`);
                     
                     if (nextMaybe !== null) {
-                        statusText.textContent = `Світло є, можливе відключення о ${formatTime(nextMaybe)}`;
+                        // Maybe = відключення (жовті завжди вимикають)
+                        const timeStr = formatTime(nextMaybe);
+                        statusText.textContent = `Світло є, вимкнуть о ${timeStr}`;
                     } else {
-                        // Немає відключень сьогодні взагалі, перевіряємо завтра
+                        // Немає відключень до кінця дня
                         if (scheduleData.tomorrow && scheduleData.tomorrow.length > 0) {
-                            const tomorrowFirst = scheduleData.tomorrow[0][0];
-                            statusText.textContent = `Світло є, вимкнуть о ${formatTime(tomorrowFirst)}`;
+                            // Є дані на завтра
+                            statusText.textContent = `Світло є, вимкнуть завтра`;
                         } else {
-                            // Взагалі немає даних про відключення
-                            statusText.textContent = `Світло є`;
+                            // Немає даних
+                            statusText.textContent = `Світло є, коли вимкнуть невідомо`;
                         }
                     }
                 }
             } else {
-                // Світла немає або можливе відключення
-                // Шукаємо наступне відновлення
+                // СВІТЛА НЕМАЄ
                 let nextRestore = null;
                 
                 // Якщо зараз MAYBE, шукаємо кінець періоду maybe або початок наступного ON
                 if (isMaybe && !isOff) {
-                    // Знаходимо наступну годину коли НЕ maybe і НЕ off
                     for (let h = currentHour + 1; h < 24; h++) {
                         const isNextOff = isOutageNow(scheduleData.today, h);
                         const isNextMaybe = scheduleData.todayMaybe && scheduleData.todayMaybe.includes(h);
@@ -1672,14 +1544,17 @@
                 console.log(`nextRestore=${nextRestore}`);
                 
                 if (nextRestore !== null) {
-                    statusText.textContent = `Світла немає, буде о ${formatTime(nextRestore)}`;
+                    // Є дані про відновлення сьогодні
+                    const timeStr = formatTime(nextRestore);
+                    statusText.textContent = `Світла немає, буде о ${timeStr}`;
                 } else {
-                    // Перевіряємо завтра
+                    // Немає відновлення до кінця дня
                     if (scheduleData.tomorrow && scheduleData.tomorrow.length > 0) {
-                        // Світло буде о 00:00 (початок завтра)
-                        statusText.textContent = `Світла немає, буде о 00:00`;
+                        // Є дані на завтра
+                        statusText.textContent = `Світла немає, буде завтра`;
                     } else {
-                        statusText.textContent = `Світла немає`;
+                        // Немає даних
+                        statusText.textContent = `Світла немає, коли буде невідомо`;
                     }
                 }
             }
@@ -1797,6 +1672,11 @@
 
         // Формат часу
         function formatTime(hour) {
+            // Перевірка на null/undefined/NaN
+            if (hour === null || hour === undefined || isNaN(hour)) {
+                return 'Невідомо';
+            }
+            
             // Перетворюємо 24 на 0 (24:00 -> 00:00)
             let normalizedHour = hour >= 24 ? hour - 24 : hour;
             
@@ -1980,56 +1860,6 @@
                 pointer.className = 'timeline-pointer status-' + currentSegment.status;
             }
         }
-
-        // Пошук по адресі
-        searchInput.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase().trim();
-            
-            // Очистити всі підсвічування
-            queueButtons.forEach(btn => {
-                btn.classList.remove('highlight-on', 'highlight-off', 'highlight-maybe');
-            });
-            
-            if (searchTerm.length === 0) {
-                searchSuggestions.classList.remove('visible');
-                searchSuggestions.innerHTML = '';
-                return;
-            }
-            
-            // Знайти відповідні адреси
-            const matches = [];
-            for (const [address, queue] of Object.entries(ADDRESS_TO_QUEUE)) {
-                if (address.includes(searchTerm)) {
-                    matches.push({ address, queue });
-                }
-            }
-            
-            if (matches.length > 0) {
-                searchSuggestions.innerHTML = '';
-                matches.forEach(match => {
-                    const item = document.createElement('div');
-                    item.className = 'suggestion-item';
-                    item.textContent = match.address;
-                    item.addEventListener('click', () => {
-                        highlightQueue(match.queue);
-                        searchInput.value = match.address;
-                        searchSuggestions.classList.remove('visible');
-                    });
-                    searchSuggestions.appendChild(item);
-                });
-                searchSuggestions.classList.add('visible');
-            } else {
-                searchSuggestions.classList.remove('visible');
-                searchSuggestions.innerHTML = '';
-            }
-        });
-
-        // Закрити випадаючий список при кліку поза ним
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.search-wrapper')) {
-                searchSuggestions.classList.remove('visible');
-            }
-        });
 
         // Функція підсвічування черги
         function highlightQueue(queueNumber) {
