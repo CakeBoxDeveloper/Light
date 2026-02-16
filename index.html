@@ -1035,6 +1035,7 @@
         
         // API endpoint
         const API_URL = 'https://off.energy.mk.ua';
+        const CORS_PROXY = 'https://corsproxy.io/?';
         
         // Маппінг черг до outage_queue_id
         const QUEUE_TO_ID = {
@@ -1054,11 +1055,13 @@
                     throw new Error('Невідома черга');
                 }
 
-                // Завантажуємо всі необхідні дані паралельно
+                console.log('📡 Завантаження даних з API для черги', queue, '(ID:', queueId, ')');
+
+                // Завантажуємо всі необхідні дані паралельно через CORS proxy
                 const [queuesResponse, timeSeriesResponse, scheduleResponse] = await Promise.all([
-                    fetch(`${API_URL}/api/outage-queue/by-type/3`),
-                    fetch(`${API_URL}/api/schedule/time-series`),
-                    fetch(`${API_URL}/api/v2/schedule/active`)
+                    fetch(`${CORS_PROXY}${API_URL}/api/outage-queue/by-type/3`),
+                    fetch(`${CORS_PROXY}${API_URL}/api/schedule/time-series`),
+                    fetch(`${CORS_PROXY}${API_URL}/api/v2/schedule/active`)
                 ]);
 
                 if (!queuesResponse.ok || !timeSeriesResponse.ok || !scheduleResponse.ok) {
@@ -1795,8 +1798,13 @@
         // Формат часу
         function formatTime(hour) {
             // Перетворюємо 24 на 0 (24:00 -> 00:00)
-            const normalizedHour = hour >= 24 ? hour - 24 : hour;
-            return `${normalizedHour.toString().padStart(2, '0')}:00`;
+            let normalizedHour = hour >= 24 ? hour - 24 : hour;
+            
+            // Розділяємо на години та хвилини
+            const hours = Math.floor(normalizedHour);
+            const minutes = Math.round((normalizedHour - hours) * 60);
+            
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
         }
 
         // Рендер таймлайну
