@@ -3,9 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Графік відключень — Миколаївобленерго</title>
     <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/CakeBoxDeveloper/Light/f40cee99e11b0c33edb613ca7ff056d6094e8e0d/2424.svg">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+    <!-- VERSION: 2.0.0 - NEW API FORMAT -->
     <style>
         * {
             margin: 0;
@@ -118,6 +122,7 @@
             word-wrap: break-word;
             white-space: normal;
             padding: 0;
+            align-self: stretch;
         }
 
         body[data-theme="light"] h1 {
@@ -1022,6 +1027,12 @@
     </div>
 
     <script>
+        // ============================================
+        // VERSION 2.0.0 - NEW API FORMAT (48 intervals)
+        // ============================================
+        console.log('%c🔥 ВЕРСІЯ 2.0.0 ЗАВАНТАЖЕНА 🔥', 'color: #00ff00; font-size: 20px; font-weight: bold;');
+        console.log('Якщо ви бачите старі функції parseScheduleData або convertHoursToPeriods - очистіть кеш браузера!');
+        
         // API endpoint
         const API_URL = 'https://off.energy.mk.ua';
         
@@ -1035,329 +1046,134 @@
             '6.1': 26, '6.2': 27
         };
         
-        // Функція для отримання даних безпосередньо з сайту облэнерго
-        async function fetchFromEnergyMkUa(queue) {
-            // Спробуємо парсити HTML сторінку
+        // Функція для отримання даних з API
+        async function fetchScheduleData(queue) {
             try {
-                const queueParam = queue.replace('.', '-'); // 5.2 -> 5-2
-                const url = `${API_URL}/?queue=${queueParam}`;
-                const proxyUrl = 'https://corsproxy.io/?';
+                const queueId = QUEUE_TO_ID[queue];
+                if (!queueId) {
+                    throw new Error('Невідома черга');
+                }
+
+                // Завантажуємо всі необхідні дані паралельно
+                const [queuesResponse, timeSeriesResponse, scheduleResponse] = await Promise.all([
+                    fetch(`${API_URL}/api/outage-queue/by-type/3`),
+                    fetch(`${API_URL}/api/schedule/time-series`),
+                    fetch(`${API_URL}/api/v2/schedule/active`)
+                ]);
+
+                if (!queuesResponse.ok || !timeSeriesResponse.ok || !scheduleResponse.ok) {
+                    throw new Error('Помилка завантаження даних');
+                }
+
+                const queues = await queuesResponse.json();
+                const timeSeries = await timeSeriesResponse.json();
+                const schedules = await scheduleResponse.json();
+
+                // Знаходимо поточну чергу
+                const currentQueue = queues.find(q => q.id === queueId);
                 
-                console.log(`Завантаження HTML для черги ${queue} з ${url}`);
+                // Знаходимо актуальний розклад на основі поточного часу
+                const now = new Date();
+                let activeSchedule = null;
                 
-                const response = await fetch(proxyUrl + encodeURIComponent(url));
-                
-                if (response.ok) {
-                    const html = await response.text();
-                    console.log('HTML завантажено, розмір:', html.length, 'байт');
+                for (const schedule of schedules) {
+                    const scheduleFrom = new Date(schedule.from);
+                    const scheduleTo = new Date(schedule.to);
                     
-                    // Парсимо HTML
-                    const parsed = parseHTMLSchedule(html, queue);
-                    if (parsed) {
-                        return parsed;
+                    if (now >= scheduleFrom && now <= scheduleTo) {
+                        activeSchedule = schedule;
+                        break;
                     }
                 }
-            } catch (error) {
-                console.log('Помилка парсингу HTML:', error);
-            }
-            
-            // Якщо HTML парсинг не вдався, спробуємо API
-            const corsProxies = [
-                'https://corsproxy.io/?',
-                'https://api.codetabs.com/v1/proxy?quest=',
-            ];
-            
-            const targetUrl = `${API_URL}/api/v2/schedule/active`;
-            
-            for (const proxy of corsProxies) {
-                try {
-                    const url = proxy + encodeURIComponent(targetUrl);
-                    console.log(`Спроба завантажити API через: ${proxy}`);
-                    
-                    const response = await fetch(url, {
-                        method: 'GET',
-                        headers: {
-                            'Accept': 'application/json',
-                        }
-                    });
-                    
-                    if (response.ok) {
-                        const data = await response.json();
-                        console.log('✓ Успішно завантажено дані з API через:', proxy);
-                        
-                        // Парсимо дані для конкретної черги
-                        const parsed = parseScheduleData(data, queue);
-                        if (parsed) {
-                            return parsed;
-                        }
-                    }
-                } catch (error) {
-                    console.log(`✗ Помилка з проксі ${proxy}:`, error.message);
-                }
-            }
-            
-            console.log('Всі спроби завантаження не вдалися, використовуємо демо-дані');
-            return null;
-        }
-        
-        // Парсинг HTML сторінки
-        function parseHTMLSchedule(html, queue) {
-            try {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
                 
-                console.log('=== ПАРСИНГ HTML ДЛЯ ЧЕРГИ', queue, '===');
-                
-                // Шукаємо всі таблиці
-                const tables = doc.querySelectorAll('table');
-                console.log('Знайдено таблиць:', tables.length);
-                
-                if (tables.length === 0) {
-                    console.log('Таблиця не знайдена');
-                    return null;
+                // Якщо не знайшли поточний, беремо перший (найближчий майбутній)
+                if (!activeSchedule && schedules.length > 0) {
+                    activeSchedule = schedules[0];
                 }
                 
-                // Беремо першу таблицю (або шукаємо потрібну)
-                let targetTable = tables[0];
-                
-                // Шукаємо всі рядки tbody > tr
-                const rows = targetTable.querySelectorAll('tbody tr');
-                console.log('Знайдено рядків в tbody:', rows.length);
-                
-                if (rows.length === 0) {
-                    // Спробуємо без tbody
-                    const allRows = targetTable.querySelectorAll('tr');
-                    console.log('Знайдено рядків без tbody:', allRows.length);
-                    
-                    // Виведемо структуру для діагностики
-                    console.log('HTML структура таблиці:', targetTable.innerHTML.substring(0, 500));
-                    return null;
+                if (!activeSchedule) {
+                    throw new Error('Немає активного розкладу');
                 }
+
+                // Парсимо розклад для нашої черги
+                const schedule = parseScheduleForQueue(activeSchedule, queueId, timeSeries);
                 
-                const offPeriods = [];
-                const maybePeriods = [];
+                console.log('✅ НОВИЙ ФОРМАТ: schedule.length =', schedule.length);
+                console.log('✅ Перший елемент:', schedule[0]);
+                console.log('✅ Останній елемент:', schedule[47]);
                 
-                // Визначаємо індекс колонки для черги
-                const queueIndex = getQueueColumnIndex(queue);
-                console.log('Індекс колонки для черги', queue, ':', queueIndex);
-                
-                // Парсимо кожен рядок
-                rows.forEach((row, index) => {
-                    const cells = row.querySelectorAll('td');
-                    if (cells.length < 2) return;
-                    
-                    // Перша колонка - час
-                    const timeText = cells[0].textContent.trim();
-                    const timeMatch = timeText.match(/(\d{2}):(\d{2})-(\d{2}):(\d{2})/);
-                    
-                    if (!timeMatch) {
-                        if (index < 5) console.log(`Рядок ${index}: не знайдено час в "${timeText}"`);
-                        return;
-                    }
-                    
-                    const startHour = parseInt(timeMatch[1]);
-                    const startMin = parseInt(timeMatch[2]);
-                    const endHour = parseInt(timeMatch[3]);
-                    const endMin = parseInt(timeMatch[4]);
-                    
-                    const startTime = startHour + startMin / 60;
-                    const endTime = endHour + endMin / 60;
-                    
-                    if (queueIndex >= cells.length) {
-                        if (index < 5) console.log(`Рядок ${index}: немає колонки ${queueIndex}`);
-                        return;
-                    }
-                    
-                    const cell = cells[queueIndex];
-                    const cellClass = cell.className || '';
-                    const cellStyle = cell.style.backgroundColor || '';
-                    const cellText = cell.textContent.trim().toLowerCase();
-                    
-                    // Визначаємо тип
-                    let type = 'on';
-                    if (cellClass.includes('off') || cellClass.includes('red') || cellStyle.includes('red') || 
-                        cellText.includes('відключення') || cellText.includes('немає') || cellText.includes('off')) {
-                        type = 'off';
-                    } else if (cellClass.includes('maybe') || cellClass.includes('yellow') || cellStyle.includes('yellow') ||
-                               cellText.includes('можливо') || cellText.includes('може') || cellText.includes('maybe')) {
-                        type = 'maybe';
-                    }
-                    
-                    if (type === 'off') {
-                        offPeriods.push([startTime, endTime]);
-                        if (index < 10) console.log(`  ${timeText} - OFF`);
-                    } else if (type === 'maybe') {
-                        maybePeriods.push([startTime, endTime]);
-                        if (index < 10) console.log(`  ${timeText} - MAYBE`);
-                    } else {
-                        if (index < 10) console.log(`  ${timeText} - ON`);
-                    }
-                });
-                
-                console.log('Знайдено періодів OFF:', offPeriods.length);
-                console.log('Знайдено періодів MAYBE:', maybePeriods.length);
-                console.log('===========================================');
-                
-                if (offPeriods.length === 0 && maybePeriods.length === 0) {
-                    console.log('Не вдалося розпарсити дані з HTML');
-                    return null;
-                }
-                
-                // Конвертуємо в формат який очікує додаток
-                const todayPeriods = offPeriods.map(([start, end]) => [Math.floor(start), Math.ceil(end)]);
-                const todayMaybeHours = [...new Set(maybePeriods.map(([start]) => Math.floor(start)))];
-                
-                return {
-                    today: todayPeriods,
-                    tomorrow: [],
-                    todayMaybe: todayMaybeHours,
+                // Повертаємо у форматі який очікує код
+                // schedule - це масив з 48 елементів { time, timeEnd, status }
+                const result = {
+                    today: schedule, // Масив з 48 елементів
+                    tomorrow: schedule, // Поки що той самий розклад
+                    todayMaybe: [], // Не використовується з новим форматом
                     tomorrowMaybe: [],
-                    halfHourPrecision: true,
-                    offPeriodsDetailed: offPeriods,
-                    maybePeriodsDetailed: maybePeriods
+                    queue: queue,
+                    queueEnabled: currentQueue ? currentQueue.enabled : 0,
+                    lastUpdate: new Date().toISOString()
                 };
                 
+                console.log('✅ ПОВЕРТАЄМО ДАНІ:', result);
+                return result;
+                
             } catch (error) {
-                console.error('Помилка парсингу HTML:', error);
-                return null;
+                console.error('Помилка завантаження даних:', error);
+                throw error;
             }
         }
-        
-        // Визначає індекс колонки для черги в таблиці
-        function getQueueColumnIndex(queue) {
-            // Припускаємо що колонки йдуть: час, 1.1, 1.2, 2.1, 2.2, 3.1, 3.2, 4.1, 4.2, 5.1, 5.2, 6.1, 6.2
-            const queueOrder = ['1.1', '1.2', '2.1', '2.2', '3.1', '3.2', '4.1', '4.2', '5.1', '5.2', '6.1', '6.2'];
-            const index = queueOrder.indexOf(queue);
-            return index >= 0 ? index + 1 : 1; // +1 тому що перша колонка - час
-        }
-        
-        // Парсинг даних з API для конкретної черги
-        function parseScheduleData(apiData, queue) {
-            if (!apiData || !apiData[0] || !apiData[0].series) {
-                return null;
-            }
+
+        // Парсинг розкладу для конкретної черги
+        function parseScheduleForQueue(scheduleData, queueId, timeSeries) {
+            const result = [];
             
-            const queueId = QUEUE_TO_ID[queue];
-            if (!queueId) {
-                console.log('Невідома черга:', queue);
-                return null;
-            }
-            
-            const series = apiData[0].series;
-            
-            // Виводимо всі унікальні outage_queue_id для діагностики
-            const uniqueQueueIds = [...new Set(series.map(s => s.outage_queue_id))].sort((a, b) => a - b);
-            console.log('Доступні outage_queue_id в API:', uniqueQueueIds);
-            
-            // Виводимо графік для всіх черг для діагностики
-            console.log('\n=== ГРАФІКИ ДЛЯ ВСІХ ЧЕРГ (година 11-14) ===');
-            uniqueQueueIds.forEach(qId => {
-                const queueName = Object.keys(QUEUE_TO_ID).find(k => QUEUE_TO_ID[k] === qId) || `ID:${qId}`;
-                const hours11_14 = [];
-                for (let h = 11; h <= 13; h++) {
-                    const off = series.find(s => s.time_series_id === h + 1 && s.outage_queue_id === qId && s.type === 'OFF');
-                    const maybe = series.find(s => s.time_series_id === h + 1 && s.outage_queue_id === qId && s.type === 'PROBABLY_OFF');
-                    hours11_14.push(off ? 'OFF' : maybe ? 'MAYBE' : 'ON');
-                }
-                console.log(`Черга ${queueName}: 11:00=${hours11_14[0]}, 12:00=${hours11_14[1]}, 13:00=${hours11_14[2]}`);
+            // Створюємо мапу часових інтервалів
+            const timeMap = {};
+            timeSeries.forEach(ts => {
+                timeMap[ts.id] = {
+                    start: ts.start,
+                    end: ts.end
+                };
             });
-            console.log('==========================================\n');
-            
-            const today = [];
-            const tomorrow = [];
-            const todayMaybe = [];
-            const tomorrowMaybe = [];
-            
-            console.log(`Парсинг даних для черги ${queue} (ID: ${queueId})`);
-            console.log('=== ДЕТАЛЬНИЙ РОЗКЛАД ДЛЯ ЦІЄЇ ЧЕРГИ (всі 24 години) ===');
-            
-            // Групуємо відключення по годинах
-            for (let hour = 0; hour < 24; hour++) {
-                const timeSeriesId = hour + 1; // 1-24 для сьогодні
-                const tomorrowTimeSeriesId = hour + 25; // 25-48 для завтра
-                
-                // Перевіряємо сьогодні
-                const todayOff = series.find(s => 
-                    s.time_series_id === timeSeriesId && 
-                    s.outage_queue_id === queueId && 
-                    s.type === 'OFF'
-                );
-                
-                const todayProbablyOff = series.find(s => 
-                    s.time_series_id === timeSeriesId && 
-                    s.outage_queue_id === queueId && 
-                    s.type === 'PROBABLY_OFF'
-                );
-                
-                // Детальний вивід для діагностики
-                const status = todayOff ? 'OFF (червоний)' : todayProbablyOff ? 'PROBABLY_OFF (жовтий)' : 'ON (зелений)';
-                console.log(`  ${hour.toString().padStart(2, '0')}:00 - ${status}`);
-                
-                if (todayOff) {
-                    today.push(hour);
-                } else if (todayProbablyOff) {
-                    todayMaybe.push(hour);
+
+            // Групуємо записи по time_series_id
+            const seriesByTime = {};
+            scheduleData.series.forEach(entry => {
+                if (entry.outage_queue_id === queueId) {
+                    if (!seriesByTime[entry.time_series_id]) {
+                        seriesByTime[entry.time_series_id] = [];
+                    }
+                    seriesByTime[entry.time_series_id].push(entry.type);
                 }
+            });
+
+            // Формуємо результат для кожного часового інтервалу
+            for (let i = 1; i <= 48; i++) {
+                const timeInfo = timeMap[i];
+                const types = seriesByTime[i] || [];
                 
-                // Перевіряємо завтра
-                const tomorrowOff = series.find(s => 
-                    s.time_series_id === tomorrowTimeSeriesId && 
-                    s.outage_queue_id === queueId && 
-                    s.type === 'OFF'
-                );
+                let status = 'on'; // За замовчуванням світло є
                 
-                const tomorrowProbablyOff = series.find(s => 
-                    s.time_series_id === tomorrowTimeSeriesId && 
-                    s.outage_queue_id === queueId && 
-                    s.type === 'PROBABLY_OFF'
-                );
-                
-                if (tomorrowOff) {
-                    tomorrow.push(hour);
-                } else if (tomorrowProbablyOff) {
-                    tomorrowMaybe.push(hour);
+                if (types.includes('OFF')) {
+                    status = 'off';
+                } else if (types.includes('PROBABLY_OFF')) {
+                    status = 'maybe';
                 }
+
+                result.push({
+                    time: timeInfo.start.substring(0, 5), // "HH:MM"
+                    timeEnd: timeInfo.end.substring(0, 5),
+                    status: status
+                });
             }
-            
-            // Конвертуємо масиви годин в періоди [start, end]
-            const todayPeriods = convertHoursToPeriods(today);
-            const tomorrowPeriods = convertHoursToPeriods(tomorrow);
-            
-            console.log('===========================================');
-            console.log('Результат парсингу:');
-            console.log('  today (години OFF):', today);
-            console.log('  todayMaybe (години PROBABLY_OFF):', todayMaybe);
-            console.log('  today (періоди):', todayPeriods);
-            console.log('  todayMaybe (години):', todayMaybe);
-            console.log('===========================================');
-            
-            return {
-                today: todayPeriods,
-                tomorrow: tomorrowPeriods,
-                todayMaybe: todayMaybe,
-                tomorrowMaybe: tomorrowMaybe
-            };
+
+            return result;
         }
-        
-        // Конвертує масив годин в періоди
-        function convertHoursToPeriods(hours) {
-            if (hours.length === 0) return [];
-            
-            hours.sort((a, b) => a - b);
-            const periods = [];
-            let start = hours[0];
-            let prev = hours[0];
-            
-            for (let i = 1; i < hours.length; i++) {
-                if (hours[i] !== prev + 1) {
-                    periods.push([start, prev + 1]);
-                    start = hours[i];
-                }
-                prev = hours[i];
-            }
-            
-            periods.push([start, prev + 1]);
-            return periods;
+
+        // Функція для отримання даних безпосередньо з сайту облэнерго
+        async function fetchFromEnergyMkUa(queue) {
+            // Використовуємо новий API
+            return await fetchScheduleData(queue);
         }
 
         // Демо-дані графіків (резервні дані)
@@ -1885,33 +1701,93 @@
             });
         }
 
-        // Перевірка відключення зараз
+        // Перевірка відключення зараз (НОВИЙ ФОРМАТ - 48 інтервалів)
         function isOutageNow(schedule, hour) {
-            return schedule.some(([start, end]) => hour >= start && hour < end);
+            // schedule - масив з 48 елементів { time, timeEnd, status }
+            // hour - поточна година (0-23)
+            if (!schedule || !Array.isArray(schedule) || schedule.length !== 48) {
+                // Старий формат - залишаємо сумісність
+                if (Array.isArray(schedule) && schedule.length > 0 && Array.isArray(schedule[0])) {
+                    return schedule.some(([start, end]) => hour >= start && hour < end);
+                }
+                return false;
+            }
+            
+            // Знаходимо інтервали для цієї години (2 інтервали по 30 хв)
+            const interval1 = schedule[hour * 2]; // XX:00-XX:30
+            const interval2 = schedule[hour * 2 + 1]; // XX:30-XX+1:00
+            
+            // Якщо хоча б один інтервал OFF - світла немає
+            return interval1?.status === 'off' || interval2?.status === 'off';
         }
 
-        // Наступне відключення
+        // Наступне відключення (НОВИЙ ФОРМАТ)
         function getNextOutage(schedule, hour) {
-            for (let [start, end] of schedule) {
-                if (hour < start) return start;
+            if (!schedule || !Array.isArray(schedule)) {
+                return null;
+            }
+            
+            // Перевіряємо чи це новий формат (48 елементів з об'єктами)
+            if (schedule.length === 48 && schedule[0]?.status) {
+                // Шукаємо наступний інтервал зі статусом 'off'
+                for (let i = hour * 2; i < 48; i++) {
+                    if (schedule[i]?.status === 'off') {
+                        // Повертаємо час початку у форматі години
+                        return Math.floor(i / 2) + (i % 2) * 0.5;
+                    }
+                }
+            } else {
+                // Старий формат [[start, end]]
+                for (let [start, end] of schedule) {
+                    if (hour < start) return start;
+                }
             }
             return null;
         }
 
         // Наступне можливе відключення
-        function getNextMaybe(maybeHours, hour) {
-            if (!maybeHours || maybeHours.length === 0) return null;
+        function getNextMaybe(scheduleOrHours, hour) {
+            if (!scheduleOrHours || scheduleOrHours.length === 0) return null;
             
-            for (let maybeHour of maybeHours) {
-                if (hour < maybeHour) return maybeHour;
+            // Якщо це масив чисел (старий формат todayMaybe)
+            if (typeof scheduleOrHours[0] === 'number') {
+                for (let maybeHour of scheduleOrHours) {
+                    if (hour < maybeHour) return maybeHour;
+                }
+                return null;
             }
+            
+            // Якщо це новий формат (48 елементів)
+            if (scheduleOrHours.length === 48 && scheduleOrHours[0]?.status) {
+                for (let i = hour * 2; i < 48; i++) {
+                    if (scheduleOrHours[i]?.status === 'maybe') {
+                        return Math.floor(i / 2) + (i % 2) * 0.5;
+                    }
+                }
+            }
+            
             return null;
         }
 
-        // Наступне відновлення
+        // Наступне відновлення (НОВИЙ ФОРМАТ)
         function getNextRestore(schedule, hour) {
-            for (let [start, end] of schedule) {
-                if (hour >= start && hour < end) return end;
+            if (!schedule || !Array.isArray(schedule)) {
+                return null;
+            }
+            
+            // Перевіряємо чи це новий формат
+            if (schedule.length === 48 && schedule[0]?.status) {
+                // Шукаємо наступний інтервал зі статусом 'on' після поточного відключення
+                for (let i = hour * 2; i < 48; i++) {
+                    if (schedule[i]?.status === 'on') {
+                        return Math.floor(i / 2) + (i % 2) * 0.5;
+                    }
+                }
+            } else {
+                // Старий формат
+                for (let [start, end] of schedule) {
+                    if (hour >= start && hour < end) return end;
+                }
             }
             return null;
         }
@@ -1935,39 +1811,30 @@
                 oldPointer.remove();
             }
             
-            // Створюємо масив статусів для кожної години
-            const hourStatuses = new Array(24).fill('on');
+            // Створюємо масив статусів для кожного 30-хвилинного інтервалу (48 інтервалів)
+            const intervalStatuses = new Array(48).fill('on');
             
-            // Позначаємо години з відключеннями
-            schedule.forEach(([start, end]) => {
-                for (let hour = start; hour < end; hour++) {
-                    hourStatuses[hour] = 'off';
-                }
-            });
-            
-            // Позначаємо години з можливими відключеннями
-            if (maybePeriods && maybePeriods.length > 0) {
-                maybePeriods.forEach(hour => {
-                    if (hourStatuses[hour] === 'on') {
-                        hourStatuses[hour] = 'maybe';
-                    }
+            // Заповнюємо статуси з розкладу (schedule - це масив з 48 елементів)
+            if (schedule && schedule.length === 48) {
+                schedule.forEach((item, index) => {
+                    intervalStatuses[index] = item.status; // 'on', 'off', або 'maybe'
                 });
             }
             
-            // Групуємо години за статусом для створення сегментів
+            // Групуємо інтервали за статусом для створення сегментів
             const segments = [];
-            let currentStatus = hourStatuses[0];
-            let currentStart = 0;
+            let currentStatus = intervalStatuses[0];
+            let currentStart = 0; // В годинах (0.0 - 24.0)
             
-            for (let hour = 1; hour < 24; hour++) {
-                if (hourStatuses[hour] !== currentStatus) {
+            for (let i = 1; i < 48; i++) {
+                if (intervalStatuses[i] !== currentStatus) {
                     segments.push({
                         start: currentStart,
-                        end: hour,
+                        end: i * 0.5, // Кожен інтервал = 0.5 години
                         status: currentStatus
                     });
-                    currentStatus = hourStatuses[hour];
-                    currentStart = hour;
+                    currentStatus = intervalStatuses[i];
+                    currentStart = i * 0.5;
                 }
             }
             
